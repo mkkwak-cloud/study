@@ -55,14 +55,15 @@ export function TodoInput({ onAdd }: TodoInputProps) {
           placeholder="할일을 입력하세요 (예: 팀 회의 자료 준비)"
           aria-label="할일 내용"
           maxLength={MAX_TITLE_LENGTH}
-          className="w-full flex-1 rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200"
+          // py-3(약 44px 높이)로 모바일에서 터치하기 편한 크기를 확보한다.
+          className="w-full flex-1 rounded-lg border border-neutral-300 bg-white px-4 py-3 text-base text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200 sm:text-sm"
         />
         <div className="flex gap-2">
           <select
             value={category}
             onChange={(event) => handleCategoryChange(event.target.value as Category)}
             aria-label="카테고리"
-            className="rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-sm text-neutral-900 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200"
+            className="flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-3 text-base text-neutral-900 focus:border-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-200 sm:flex-initial sm:text-sm"
           >
             {CATEGORIES.map((item) => (
               <option key={item} value={item}>
@@ -73,7 +74,7 @@ export function TodoInput({ onAdd }: TodoInputProps) {
           <button
             type="submit"
             disabled={!title.trim()}
-            className="shrink-0 rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-neutral-300"
+            className="shrink-0 rounded-lg bg-neutral-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-neutral-300"
           >
             추가
           </button>
