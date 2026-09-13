@@ -91,7 +91,7 @@ function App() {
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pt-3 pb-3 sm:px-6 sm:pt-4">
-          <h1 className="text-lg font-semibold text-neutral-900 sm:text-xl">할일 관리</h1>
+          <h1 className="text-lg font-semibold text-neutral-900 sm:text-xl">TASK MANAGEMENT</h1>
           <TodoInput onAdd={(title, category) => addTodo({ title, category })} />
         </div>
       </header>
