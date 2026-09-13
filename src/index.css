@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-category-work: #2563eb; /* 업무 */
+  --color-category-work-soft: #dbeafe;
+  --color-category-personal: #db2777; /* 개인 */
+  --color-category-personal-soft: #fce7f3;
+  --color-category-study: #059669; /* 공부 */
+  --color-category-study-soft: #d1fae5;
+  --color-category-travel: #d97706; /* 여행 */
+  --color-category-travel-soft: #fef3c7;
+}
+
+body {
+  margin: 0;
+}
