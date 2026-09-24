@@ -57,6 +57,7 @@ npm run lint
 | FR-14 (연결성 표시) | `DeviceCardShell.tsx`/`DeviceDetailView.tsx` 연결 점·배지 (로컬/클라우드) | |
 | FR-21 (낙관적 상태 + 롤백) | `homeStore.ts` `commit()` | |
 | FR-22 (고위험 기기 원격 시작 우회 금지) | `DeviceDetailView.tsx` | 세탁기/건조기/식기세척기는 상태 표시만. 인덕션(고위험)은 상세 화면에서 `window.confirm` 확인 후에만 토글 가능 |
+| FR-20 확장 (로봇청소기 원격 시작) | `VacuumCard.tsx`, `homeStore.ts` `startCleaning/pauseCleaning/returnVacuumToDock` | `appliance` 도메인과 별도의 `vacuum` 도메인. 세탁기 등과 달리 원격 시작이 표준 기능이라(FR-22 예외) 확인 절차 없이 바로 시작/일시정지/충전독 복귀 가능 |
 | FR-40/41/43 (씬/모드) | `homeStore.ts` `setHouseMode()` | `home-assistant/config/packages/scenes_core.yaml` 의 로직을 그대로 옮김 |
 | §4.3 (위치 피드백 없는 커버) | `types/home.ts` `CoverDevice.position`(number \| null), `CoverCard.tsx` | C5(IR/RF) 케이스 대비 |
 

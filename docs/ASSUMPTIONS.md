@@ -41,6 +41,7 @@ HA entity_id로 맞춰야 한다. 기기/방 대응은 동일하다:
 | `climate.living_room_ac` | `climate.living_room_ac` | 거실 에어컨 | living_room |
 | `climate.living_room_nest_thermostat` | `climate.living_room_nest_thermostat` | 거실 난방조절기 (Google Nest, SDM API) | living_room |
 | `media_player.nest_hub` | `media_player.nest_hub` | Nest Hub 2세대 | living_room |
+| `vacuum.living_room` | `vacuum.living_room` | 로봇청소기 (원격 시작 가능, FR-22 예외) | living_room |
 | `light.bedroom_main` | `light.bedroom_main` | 안방 조명 | bedroom |
 | `climate.bedroom_ac` | `climate.bedroom_ac` | 안방 에어컨 | bedroom |
 | `light.kitchen_main` | `light.kitchen_main` | 주방 조명 | kitchen |

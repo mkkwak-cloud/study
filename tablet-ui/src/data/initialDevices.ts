@@ -83,6 +83,18 @@ export const initialDevices: Device[] = [
     volume: 50,
   },
   {
+    id: 'vacuum.living_room',
+    name: '거실 로봇청소기',
+    room: 'living_room',
+    domain: 'vacuum',
+    safetyTier: 'low',
+    connection: 'cloud', // 삼성/LG 로봇청소기 모두 SmartThings/ThinQ 클라우드 경유(PRD 4.1)
+    pending: false,
+    lastUpdated: now(),
+    status: 'docked',
+    batteryLevel: 100,
+  },
+  {
     id: 'light.bedroom_main',
     name: '안방 조명',
     room: 'bedroom',

@@ -9,7 +9,15 @@ const DOMAIN_ICON: Record<Device['domain'], string> = {
   climate: '❄️',
   media_player: '📺',
   appliance: '🔌',
+  vacuum: '🤖',
 }
+
+const VACUUM_STATUS_LABEL = {
+  docked: '충전독',
+  cleaning: '청소 중',
+  paused: '일시정지',
+  returning: '복귀 중',
+} as const
 
 const APPLIANCE_ICON: Record<
   Extract<Device, { domain: 'appliance' }>['kind'],
@@ -268,6 +276,43 @@ export function DeviceDetailView({ device, onBack }: { device: Device; onBack: (
             <p className="text-xs text-gray-500">
               벤더가 원격 시작을 허용하지 않는 가전은 상태만 표시합니다(FR-22)
             </p>
+          </div>
+        )}
+
+        {device.domain === 'vacuum' && (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-gray-100">
+                {VACUUM_STATUS_LABEL[device.status]}
+              </span>
+              <span className="text-sm text-gray-400">배터리 {device.batteryLevel}%</span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => homeActions.startCleaning(device.id)}
+                disabled={device.status === 'cleaning'}
+                className="touch-target rounded-2xl bg-[var(--color-status-on)] py-4 text-base font-semibold text-black disabled:opacity-40"
+              >
+                청소 시작
+              </button>
+              <button
+                type="button"
+                onClick={() => homeActions.pauseCleaning(device.id)}
+                disabled={device.status !== 'cleaning'}
+                className="touch-target rounded-2xl bg-[var(--color-surface-sunken)] py-4 text-base font-medium text-gray-100 disabled:opacity-40"
+              >
+                일시정지
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => homeActions.returnVacuumToDock(device.id)}
+              disabled={device.status === 'docked' || device.status === 'returning'}
+              className="touch-target w-full rounded-2xl bg-[var(--color-surface-sunken)] py-4 text-base font-medium text-gray-100 disabled:opacity-40"
+            >
+              충전독으로 복귀
+            </button>
           </div>
         )}
       </div>

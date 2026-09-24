@@ -4,6 +4,7 @@ import { CoverCard } from './CoverCard'
 import { ClimateCard } from './ClimateCard'
 import { MediaCard } from './MediaCard'
 import { ApplianceCard } from './ApplianceCard'
+import { VacuumCard } from './VacuumCard'
 
 export function DeviceCard({
   device,
@@ -25,5 +26,7 @@ export function DeviceCard({
       return <MediaCard device={device} room={room} onSelect={onSelect} />
     case 'appliance':
       return <ApplianceCard device={device} room={room} onSelect={onSelect} />
+    case 'vacuum':
+      return <VacuumCard device={device} room={room} onSelect={onSelect} />
   }
 }

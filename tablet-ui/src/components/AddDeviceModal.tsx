@@ -9,6 +9,7 @@ const DOMAIN_LABEL: Record<DeviceDomain, string> = {
   climate: '냉난방',
   media_player: '미디어',
   appliance: '가전',
+  vacuum: '로봇청소기',
 }
 
 const APPLIANCE_KIND_LABEL: Record<ApplianceDevice['kind'], string> = {

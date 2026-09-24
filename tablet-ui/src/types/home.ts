@@ -32,6 +32,7 @@ export type DeviceDomain =
   | 'climate'
   | 'media_player'
   | 'appliance'
+  | 'vacuum'
 
 interface DeviceBase {
   id: string
@@ -90,12 +91,24 @@ export interface ApplianceDevice extends DeviceBase {
   doorOpen?: boolean
 }
 
+// 로봇청소기는 세탁기/건조기 등과 달리 벤더가 원격 시작을 막지 않는 가전이라
+// (FR-22 예외) appliance 로 뭉치지 않고 HA의 실제 vacuum 도메인처럼 별도
+// 모델링해 시작/정지/충전독 복귀 컨트롤을 제공한다.
+export type VacuumStatus = 'docked' | 'cleaning' | 'paused' | 'returning'
+
+export interface VacuumDevice extends DeviceBase {
+  domain: 'vacuum'
+  status: VacuumStatus
+  batteryLevel: number // 0-100
+}
+
 export type Device =
   | LightDevice
   | CoverDevice
   | ClimateDevice
   | MediaPlayerDevice
   | ApplianceDevice
+  | VacuumDevice
 
 export interface AttentionItem {
   id: string

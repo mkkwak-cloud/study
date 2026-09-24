@@ -166,6 +166,26 @@ class HomeStore {
     this.commit(id, { on: next }, { on: next })
   }
 
+  // 로봇청소기는 세탁기/건조기와 달리 원격 시작이 표준 기능이라(FR-22 예외)
+  // 확인 절차 없이 바로 시작/정지/복귀할 수 있다.
+  startCleaning(id: string) {
+    const d = this.state.devices[id]
+    if (!d || d.domain !== 'vacuum') return
+    this.commit(id, { status: 'cleaning' }, { status: 'cleaning' })
+  }
+
+  pauseCleaning(id: string) {
+    const d = this.state.devices[id]
+    if (!d || d.domain !== 'vacuum') return
+    this.commit(id, { status: 'paused' }, { status: 'paused' })
+  }
+
+  returnVacuumToDock(id: string) {
+    const d = this.state.devices[id]
+    if (!d || d.domain !== 'vacuum') return
+    this.commit(id, { status: 'returning' }, { status: 'docked' })
+  }
+
   // --- 신규 기기 등록 (FR-01/FR-02 확장) ---
   //
   // 실제 HA 연동 단계에서는 이 메서드가 사라지고, 벤더 통합이 새 기기를
@@ -220,6 +240,9 @@ class HomeStore {
         }
         break
       }
+      case 'vacuum':
+        device = { ...base, domain: 'vacuum', safetyTier: 'low', status: 'docked', batteryLevel: 100 }
+        break
     }
 
     this.state = {

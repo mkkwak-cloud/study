@@ -98,8 +98,12 @@ views:
             entity: climate.living_room_ac
           - type: thermostat
             entity: climate.living_room_nest_thermostat # Google Nest 난방조절기(SDM API)
-          - type: media-player
+          - type: media-control
             entity: media_player.nest_hub # 샘플(Q4): Nest Hub 2세대
+          - type: entities
+            title: 로봇청소기
+            entities:
+              - entity: vacuum.living_room
 
   - title: 안방
     path: bedroom
