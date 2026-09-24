@@ -16,10 +16,20 @@ Tailwind CSS 4 + oxlint.
 
 ## 실행
 
+**빠른 실행(권장)** — 빌드 + 정적 서버 기동 + 브라우저 자동 실행을 한 번에:
+
+```bash
+./run.sh          # macOS/Linux (기본 포트 4173, PORT=8080 ./run.sh 로 변경 가능)
+run.bat           # Windows
+```
+
+**개발 중 수동 실행**:
+
 ```bash
 npm install
-npm run dev       # http://localhost:5173
+npm run dev       # http://localhost:5173 (HMR 개발 서버)
 npm run build     # 타입체크 + 프로덕션 빌드
+npm run preview   # 빌드 결과물을 정적 서버로 미리보기
 npm run lint
 ```
 
