@@ -27,16 +27,16 @@ workday:
     country: KR
 
 # --- 브랜드별 통합 (9.1) ---
-# 아래 항목은 실제 기기 인벤토리(§4.2, inventory/inventory.yaml.example)와
-# 오픈 이슈(Q1~Q4) 확인 후 HA UI(설정 > 기기 및 서비스)에서 OAuth/PAT 플로우로
-# 추가하는 것이 원칙이다(YAML 플랫폼 설정이 아닌 Config Entry 방식).
-# 이 파일에는 YAML로만 설정 가능한 항목만 남긴다.
-
-# LAN 로컬 통합 예시 (9.2) — 실제 IP/기기는 자동 탐지(FR-02) 또는 아래에서 직접 지정
-# samsungtv:
-#   - host: 192.0.2.10   # 거실 삼성 TV, DHCP 예약 필요(4.2 항목9)
-# webostv:
-#   - host: 192.0.2.11   # 안방 LG TV
+# 대부분은 HA UI(설정 > 기기 및 서비스)에서 OAuth/PAT 플로우로 추가하는 것이
+# 원칙이다(YAML 플랫폼 설정이 아닌 Config Entry 방식). SmartThings/LG ThinQ/
+# Google Nest SDM/Matter/SwitchBot(BLE) 모두 여기 해당하며 이 파일에는 없다.
+#
+# 아래는 docs/ASSUMPTIONS.md 샘플 네트워크(Q6: IoT VLAN 192.168.10.0/24,
+# 신뢰 VLAN 192.168.20.0/24)를 가정한 예시다. 실제 VLAN 구성 후 IP를 교체한다.
+samsungtv:
+  - host: 192.168.10.21 # 거실 삼성 TV — DHCP 예약 필요(4.2 항목9)
+webostv:
+  - host: 192.168.10.22 # 안방 LG TV — 최초 페어링 시 TV 화면에서 승인 필요
 
 mqtt:
   broker: !secret mqtt_broker_host

@@ -4,27 +4,103 @@
 # 아래 각 항목의 room/domain 값이 packages/*.yaml 의 entity_id 명명 규칙과
 # dashboards/ui-lovelace.yaml 의 방별 뷰 구성 기준이 된다(FR-04, NFR-41).
 #
+# 오픈 이슈(Q1~Q12) 확인 전까지는 ../../../docs/ASSUMPTIONS.md 에 기록한 샘플
+# 값을 사용한다. 실제 기기가 확정되면 이 파일과 ASSUMPTIONS.md를 함께 갱신한다.
+#
 # 사용법: 실제 기기마다 한 항목씩 채워 inventory.yaml 로 저장(Git 커밋 가능,
 # 자격증명은 포함하지 않으므로 secrets.yaml 과 달리 버전 관리 대상).
 
 devices:
-  - id: living_room_curtain # 예시 — 오픈 이슈 Q1: 브랜드/모델 확인 전 placeholder
-    brand: unknown # [확인 필요: Q1] 커튼 제조사
-    model: unknown # [확인 필요: Q1]
+  - id: living_room_curtain
+    entity_id: cover.living_room_curtain
+    brand: switchbot # 샘플(Q1) — docs/ASSUMPTIONS.md
+    model: "Curtain 3 (모터) + Hub Mini (Wi-Fi 브리지)"
     room: living_room
     domain: cover
-    comm: [ble, wifi] # 확정(§4.1, §4.3)
-    integration_path: C4_ble_local # C3(wifi_local화) | C4(ble_local) | C7(smartthings) — Q1 확인 후 확정
-    local_or_cloud: L # 잠정. BLE 로컬 검증 실패 시 C로 재분류(IR-07)
+    comm: [ble, wifi]
+    integration_path: C4_ble_local # HA switchbot 통합(BLE) — Bluetooth 프록시 필요시 ESPHome 연동
+    local_or_cloud: L
     matter_qr: false
-    firmware: unknown
-    connected_hub: unknown # 기존 SmartThings 등록 여부 확인 필요(4.3 C7)
+    connected_hub: null
     required_automations: [S1_away, S3_sleep, S4_morning_curtain]
     safety_tier: low
     static_ip_or_reservation: false
     power_monitoring_needed: false
 
-  - id: living_room_samsung_tv
+  - id: bedroom_curtain
+    entity_id: cover.bedroom_curtain
+    brand: switchbot # 샘플(Q1)
+    model: "Curtain 3 (모터) + Hub Mini (Wi-Fi 브리지)"
+    room: bedroom
+    domain: cover
+    comm: [ble, wifi]
+    integration_path: C4_ble_local
+    local_or_cloud: L
+    matter_qr: false
+    connected_hub: null
+    required_automations: [S1_away, S3_sleep, S4_morning_curtain]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: living_room_main_light
+    entity_id: light.living_room_main
+    brand: unknown # [확인 필요: Q3] — 공통 조명은 Zigbee/Matter 전구로 가정
+    model: unknown
+    room: living_room
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: bedroom_main_light
+    entity_id: light.bedroom_main
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: bedroom
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: living_room_ac
+    entity_id: climate.living_room_ac
+    brand: lg # [확인 필요: Q3] 삼성/LG 여부. 샘플로 LG ThinQ 가정
+    model: unknown
+    room: living_room
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S1_away]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: bedroom_ac
+    entity_id: climate.bedroom_ac
+    brand: lg # [확인 필요: Q3]
+    model: unknown
+    room: bedroom
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S1_away]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: living_room_tv
+    entity_id: media_player.living_room_tv
     brand: samsung
     model: unknown # [확인 필요: Q3]
     room: living_room
@@ -33,61 +109,136 @@ devices:
     integration_path: samsungtv_local
     local_or_cloud: L
     matter_qr: false
-    firmware: unknown
     connected_hub: null
     required_automations: [S1_away, S12_movie_mode]
     safety_tier: low
     static_ip_or_reservation: true
     power_monitoring_needed: false
 
+  - id: nest_hub
+    entity_id: media_player.nest_hub
+    brand: google
+    model: "Nest Hub (2세대, 2021)" # 샘플(Q4) — Thread Border Router 내장 세대
+    room: living_room
+    domain: media_player
+    comm: [wifi, thread]
+    integration_path: cast_local
+    local_or_cloud: L
+    matter_qr: unknown
+    connected_hub: null
+    required_automations: [S5_appliance_done_tts, S10_voice_coexist]
+    safety_tier: n/a
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+    notes: >
+      Thread BR 로 재사용 가정(docs/ASSUMPTIONS.md Q4). HA `thread` 통합이
+      기존 Thread 네트워크를 자동 탐지한다고 가정 — 별도 OTBR 동글 불필요.
+
   - id: smartthings_station
+    entity_id: null # 허브 자체는 엔티티가 아니라 Thread/Matter 인프라 역할
     brand: samsung
-    model: unknown # [확인 필요: Q4] Thread/Matter BR 지원 세대인지
+    model: "SmartThings Station (2023, GP-U999BBUALWJ)" # 샘플(Q4)
     room: utility
     domain: hub
-    comm: [zigbee, thread_maybe, wifi]
+    comm: [zigbee, thread, wifi]
     integration_path: matter_multiadmin_or_smartthings_api
     local_or_cloud: L/C
     matter_qr: unknown
-    firmware: unknown
     connected_hub: null
     required_automations: []
     safety_tier: n/a
     static_ip_or_reservation: true
     power_monitoring_needed: false
     notes: >
-      보유 확정(§4.1, §9.2). Zigbee 라디오는 벤더 종속이라 HA가 직접 재사용 불가(§10).
-      Thread BR 재사용 가능 여부는 세대 확인 후 결정.
+      보유 확정(§4.1, §9.2). Zigbee 라디오는 벤더 종속이라 HA가 직접 재사용
+      불가(§10) — 별도 Zigbee 코디네이터 필요. Thread BR은 재사용 가정.
 
-  - id: nest_hub
-    brand: google
-    model: unknown # [확인 필요: Q4] Nest Hub 2세대 여부가 Thread BR 보유를 가름
-    room: living_room
-    domain: media_player
-    comm: [wifi, thread_maybe]
-    integration_path: cast_local
-    local_or_cloud: L
-    matter_qr: unknown
-    firmware: unknown
-    connected_hub: null
-    required_automations: [S5_appliance_done_tts, S10_voice_coexist]
-    safety_tier: n/a
+  - id: fridge
+    entity_id: binary_sensor.fridge_door
+    brand: samsung
+    model: unknown # [확인 필요: Q3]
+    room: kitchen
+    domain: appliance
+    comm: [wifi_cloud]
+    integration_path: smartthings_api
+    local_or_cloud: C
+    required_automations: [S7_fridge_door]
+    safety_tier: low
     static_ip_or_reservation: false
     power_monitoring_needed: false
 
+  - id: kitchen_induction
+    entity_id: switch.kitchen_induction
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: kitchen
+    domain: appliance
+    comm: [wifi_cloud]
+    integration_path: smartthings_api
+    local_or_cloud: C
+    required_automations: [S1_away_high_risk_check]
+    safety_tier: high # FR-22: 원격 제어 확인 절차 필요
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: dishwasher
+    entity_id: sensor.dishwasher_operation_status
+    brand: samsung
+    model: unknown # [확인 필요: Q3]
+    room: kitchen
+    domain: appliance
+    comm: [wifi_cloud]
+    integration_path: smartthings_api
+    local_or_cloud: C
+    required_automations: [S5_appliance_done]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: washer
+    entity_id: sensor.washer_operation_status
+    brand: lg
+    model: unknown # [확인 필요: Q3]
+    room: utility
+    domain: appliance
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S5_appliance_done]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: dryer
+    entity_id: sensor.dryer_operation_status
+    brand: lg
+    model: unknown # [확인 필요: Q3]
+    room: utility
+    domain: appliance
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S5_appliance_done]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
   - id: wall_tablet
-    brand: unknown # [확인 필요: Q2]
-    model: unknown # [확인 필요: Q2]
-    room: entrance # 설치 위치 확인 필요
+    entity_id: null # 태블릿은 별도 HA Companion 앱 등록으로 device_tracker/sensor 군 생성
+    brand: samsung
+    model: "Galaxy Tab A9+ (11인치, Android 14)" # 샘플(Q2)
+    room: entrance # 설치 위치 — [확인 필요: Q2]
     domain: kiosk_display
     comm: [wifi]
     integration_path: ha_companion_app_kiosk
     local_or_cloud: L
-    os: android # 확정
+    os: android
     required_automations: [UX-06_screen_saver, UX-11_tablet_as_device]
     safety_tier: n/a
     static_ip_or_reservation: true
     power_monitoring_needed: true # UX-02 배터리 보호
 
-# 항목을 추가할 때마다 domain 값은 packages/scenes_core.yaml, automations_core.yaml
-# 의 그룹(group.*) 정의와 dashboards/ui-lovelace.yaml 의 카드 목록에도 반영해야 한다.
+# 항목을 추가할 때마다 domain 값은 packages/scenes_core.yaml, notifications.yaml
+# 의 그룹(group.*)/자동화 정의와 dashboards/ui-lovelace.yaml 의 카드 목록에도
+# 반영해야 한다. entity_id는 tablet-ui/src/data/initialDevices.ts 와도 맞춘다
+# (docs/ASSUMPTIONS.md 의 명명 규칙 표 참고).

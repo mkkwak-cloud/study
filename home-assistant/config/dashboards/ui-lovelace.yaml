@@ -6,7 +6,8 @@
 # - UX-08: 상태를 색+아이콘 동시 표현 (state_color: true)
 # - UX-10: 고위험 기기는 길게 누르기+확인(confirmation)
 #
-# entity_id 는 전부 placeholder. inventory.yaml 확정 후 실제 값으로 교체하고,
+# entity_id 는 ../../../docs/ASSUMPTIONS.md 의 샘플 결정(SwitchBot Curtain 3,
+# Galaxy Tab A9+ 등)을 따른다. inventory.yaml 이 실제 값으로 확정되면 교체하고,
 # 방(room)이 늘어나면 이 파일에 view 를 추가한다(FR-11).
 
 title: Home
@@ -76,9 +77,9 @@ views:
         entities:
           - entity: group.high_risk_appliances
             name: 켜진 고위험 가전
-          - entity: binary_sensor.any_curtain_open # placeholder — template sensor로 집계 필요
+          - entity: binary_sensor.any_curtain_open # template sensor로 집계 필요(미구현)
             name: 열린 커튼
-          - entity: persistent_notification.integration_errors # placeholder
+          - entity: persistent_notification.integration_errors # HA 코어가 통합 오류 시 자동 생성
             name: 통합 오류
 
   - title: 거실
@@ -90,15 +91,15 @@ views:
         columns: 3
         cards:
           - type: light
-            entity: light.living_room_main # placeholder
+            entity: light.living_room_main
           - type: cover
-            entity: cover.living_room_curtain # placeholder — Q1 확인 후 실제 플랫폼으로 교체
+            entity: cover.living_room_curtain # 샘플(Q1): SwitchBot Curtain 3
           - type: thermostat
-            entity: climate.living_room_ac # placeholder
+            entity: climate.living_room_ac
           - type: media-player
-            entity: media_player.living_room_samsung_tv # placeholder
+            entity: media_player.living_room_tv
           - type: media-player
-            entity: media_player.nest_hub # placeholder
+            entity: media_player.nest_hub # 샘플(Q4): Nest Hub 2세대
 
   - title: 안방
     path: bedroom
@@ -109,11 +110,11 @@ views:
         columns: 3
         cards:
           - type: light
-            entity: light.bedroom_main # placeholder
+            entity: light.bedroom_main
           - type: cover
-            entity: cover.bedroom_curtain # placeholder
+            entity: cover.bedroom_curtain # 샘플(Q1): SwitchBot Curtain 3
           - type: thermostat
-            entity: climate.bedroom_ac # placeholder
+            entity: climate.bedroom_ac
 
   - title: 주방
     path: kitchen
@@ -126,12 +127,12 @@ views:
           - type: entities
             title: 냉장고
             entities:
-              - entity: binary_sensor.fridge_door # placeholder
+              - entity: binary_sensor.fridge_door
           # 고위험 가전(오븐/인덕션): 길게 누르기 + 확인 다이얼로그 (UX-10, FR-22)
           - type: button
             name: 인덕션
             icon: mdi:stove
-            entity: switch.kitchen_induction # placeholder
+            entity: switch.kitchen_induction
             hold_action:
               action: call-service
               service: switch.toggle
@@ -153,15 +154,15 @@ views:
           - type: entities
             title: 세탁기
             entities:
-              - entity: sensor.washer_operation_status # placeholder
+              - entity: sensor.washer_operation_status
           - type: entities
             title: 건조기
             entities:
-              - entity: sensor.dryer_operation_status # placeholder
+              - entity: sensor.dryer_operation_status
           - type: entities
             title: 식기세척기
             entities:
-              - entity: sensor.dishwasher_operation_status # placeholder
+              - entity: sensor.dishwasher_operation_status
 
   - title: 관리
     path: admin

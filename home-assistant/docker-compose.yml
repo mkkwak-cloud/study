@@ -1,8 +1,10 @@
 version: "3.9"
 
 # PRD 10장 권장안 A(Home Assistant 로컬 허브)의 최소 실행 구성.
-# 실제 배포 시 하드웨어(미니PC/SBC, Zigbee 코디네이터, Thread RCP 동글)와
-# 네트워크(VLAN, mDNS 리플렉터)는 오픈 이슈 Q4/Q6/Q10 확인 후 맞춰 조정한다(NFR-22).
+# 오픈 이슈 Q4/Q6/Q10 은 ../docs/ASSUMPTIONS.md 의 샘플 값(미니PC 허브,
+# VLAN 지원 공유기+Synology NAS, SmartThings Station 2023 + Nest Hub 2세대의
+# Thread BR 재사용)을 임시로 가정해 아래 구성을 작성했다. 실제 하드웨어가
+# 확정되면 이 파일과 ASSUMPTIONS.md를 함께 갱신한다.
 #
 # 기동:
 #   cp .env.example .env  # 값 채우기
@@ -15,7 +17,7 @@ services:
     container_name: ha-core
     restart: unless-stopped
     network_mode: host # mDNS/SSDP 기기 탐지(FR-02), Matter/Cast 로컬 통합에 필요
-    privileged: true # Bluetooth(BLE 커튼, IR-07) 및 USB Zigbee 코디네이터 접근용
+    privileged: true # Bluetooth(SwitchBot Curtain 3 BLE, 샘플 Q1) 및 USB Zigbee 코디네이터 접근용
     volumes:
       - ./config:/config
       - /run/dbus:/run/dbus:ro
@@ -43,9 +45,10 @@ services:
       - ./zigbee2mqtt/data:/app/data
       - /run/udev:/run/udev:ro
     devices:
-      # USB Zigbee 코디네이터 장치 경로. 실제 장치 연결 후 `ls /dev/serial/by-id/`로 확인해 교체.
-      # (4.3 C2 — 커튼이 Zigbee가 아니라면 온습도/문열림 등 공통 센서용으로 필요, §4.1 공통)
-      - /dev/serial/by-id/PLACEHOLDER_ZIGBEE_COORDINATOR:/dev/ttyACM0
+      # 커튼은 SwitchBot(BLE)로 샘플 확정했으므로 Zigbee는 공통 센서(온습도/
+      # 문열림 등, §4.1)용으로만 쓴다. 샘플: Sonoff Zigbee 3.0 USB Dongle Plus.
+      # 실제 장치 연결 후 `ls /dev/serial/by-id/`로 확인해 교체.
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_SAMPLE:/dev/ttyACM0
     environment:
       - TZ=Asia/Seoul
 
@@ -60,6 +63,8 @@ services:
       - ./matter-server/data:/data
     command: --storage-path /data
 
-# Thread Border Router(OTBR)는 별도 RCP 동글 또는 기존 SmartThings
-# 스테이션/Nest Hub 2세대의 BR 재사용 여부에 따라 구성이 달라진다(오픈 이슈 Q4).
-# 확정 전까지 이 compose에는 포함하지 않는다.
+# Thread Border Router(OTBR): 샘플 결정(Q4)에 따라 SmartThings Station(2023)과
+# Nest Hub(2세대)가 이미 Thread BR을 내장했다고 가정하고, 별도 OTBR 컨테이너는
+# 이 compose에 포함하지 않는다. HA `thread` 통합이 두 기기가 광고하는 기존
+# Thread 네트워크를 자동 탐지한다는 전제이며, 실제로 탐지되지 않으면 RCP 동글
+# 기반 OTBR 컨테이너를 추가해야 한다.
