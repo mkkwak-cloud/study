@@ -53,6 +53,7 @@ npm run lint
 | FR-10/11/13 (홈/기기/씬 뷰) | `HomeView.tsx`, `DevicesView.tsx`, `BottomNav.tsx` | 방 탭 대신 하단 네비게이션(홈/기기/설정) + 기기 탭 안의 방 필터 칩 구조로 개편(삼성 SmartThings 앱의 하단 탭·"모든 기기" 필터 참고) |
 | FR-11 확장 (기기 선택 → 상세 조절 화면) | `DeviceDetailView.tsx`, `DeviceCardShell.tsx`, `App.tsx` | 방 그리드의 카드는 요약 타일(아이콘 배지+이름+상태, `›` 표시)이고, 탭하면 전체화면 상세로 이동해 슬라이더/모드 선택 등 세부 컨트롤을 제공 |
 | FR-12 (기기 유형/방별 필터) | `DeviceFilterChips.tsx`, `DevicesView.tsx` | "모든 기기" + 방별 칩. 모든 기기 보기에서는 카드에 방 이름을 함께 표시 |
+| FR-01/FR-02 확장 (신규 기기 추가) | `AddDeviceModal.tsx`, `homeStore.ts` `addDevice()` | 기기 탭 상단 `+` 버튼(SmartThings 참고) → 이름/방/종류(가전이면 세부 종류+고위험 여부)/연결경로 입력 폼 → 즉시 그리드에 반영. 실제 연동 시에는 벤더 통합의 자동 기기 발견(mDNS/SSDP/DHCP, config flow)으로 대체되는 자리 |
 | FR-14 (연결성 표시) | `DeviceCardShell.tsx`/`DeviceDetailView.tsx` 연결 점·배지 (로컬/클라우드) | |
 | FR-21 (낙관적 상태 + 롤백) | `homeStore.ts` `commit()` | |
 | FR-22 (고위험 기기 원격 시작 우회 금지) | `DeviceDetailView.tsx` | 세탁기/건조기/식기세척기는 상태 표시만. 인덕션(고위험)은 상세 화면에서 `window.confirm` 확인 후에만 토글 가능 |

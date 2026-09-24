@@ -56,6 +56,8 @@ HA entity_id로 맞춰야 한다. 기기/방 대응은 동일하다:
 | `climate.small_room_2_ac` | `climate.small_room_2_ac` | 작은방2 에어컨 | small_room_2 |
 | `light.small_room_3_main` | `light.small_room_3_main` | 작은방3 조명 | small_room_3 |
 | `climate.small_room_3_ac` | `climate.small_room_3_ac` | 작은방3 에어컨 | small_room_3 |
+| `light.study_main` | `light.study_main` | 서재 조명 | study |
+| `climate.study_ac` | `climate.study_ac` | 서재 에어컨 | study |
 
 **삭제된 기기** (2026-09-24 반영): 거실 TV(`media_player.living_room_tv`), 안방 커튼
 (`cover.bedroom_curtain`). 아침 커튼 자동화(S4, `scenes_core.yaml`)는 남은 유일한

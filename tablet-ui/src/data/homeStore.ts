@@ -1,4 +1,11 @@
-import type { AttentionItem, ClimateDevice, Device, HouseMode } from '../types/home'
+import type {
+  AttentionItem,
+  ClimateDevice,
+  Device,
+  DeviceDomain,
+  HouseMode,
+  NewDeviceInput,
+} from '../types/home'
 import { initialDevices } from './initialDevices'
 
 // 프론트엔드 전용 목(mock) 스토어.
@@ -157,6 +164,75 @@ class HomeStore {
     if (!d || d.domain !== 'appliance') return
     const next = !d.on
     this.commit(id, { on: next }, { on: next })
+  }
+
+  // --- 신규 기기 등록 (FR-01/FR-02 확장) ---
+  //
+  // 실제 HA 연동 단계에서는 이 메서드가 사라지고, 벤더 통합이 새 기기를
+  // 발견하면 자동으로 devices 스냅샷에 나타난다(FR-02 mDNS/SSDP/DHCP 자동
+  // 탐지, config flow). 그 전까지 이 목 스토어에서는 UI(AddDeviceModal)로
+  // 직접 등록할 수 있게 해 "신규 기기 추가" 플로우 자체를 검증한다.
+
+  addDevice(input: NewDeviceInput): string {
+    const id = this.generateDeviceId(input.domain)
+    const base = {
+      id,
+      name: input.name.trim() || '이름 없는 기기',
+      room: input.room,
+      connection: input.connection,
+      pending: false,
+      lastUpdated: Date.now(),
+    }
+
+    let device: Device
+    switch (input.domain) {
+      case 'light':
+        device = { ...base, domain: 'light', safetyTier: 'low', on: false, brightness: 80 }
+        break
+      case 'cover':
+        device = { ...base, domain: 'cover', safetyTier: 'low', position: 0, moving: null }
+        break
+      case 'climate':
+        device = {
+          ...base,
+          domain: 'climate',
+          safetyTier: 'low',
+          on: false,
+          mode: 'cool',
+          targetTemp: 24,
+          currentTemp: 24,
+        }
+        break
+      case 'media_player':
+        device = { ...base, domain: 'media_player', safetyTier: 'low', on: false, volume: 50 }
+        break
+      case 'appliance': {
+        const kind = input.applianceKind ?? 'fridge'
+        const hasDoor = kind === 'fridge' || kind === 'kimchi_fridge'
+        device = {
+          ...base,
+          domain: 'appliance',
+          kind,
+          status: 'idle',
+          safetyTier: input.highRisk ? 'high' : 'low',
+          ...(input.highRisk ? { on: false } : {}),
+          ...(hasDoor ? { doorOpen: false } : {}),
+        }
+        break
+      }
+    }
+
+    this.state = {
+      ...this.state,
+      devices: { ...this.state.devices, [id]: device },
+    }
+    this.emit()
+    return id
+  }
+
+  private generateDeviceId(domain: DeviceDomain) {
+    const suffix = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
+    return `${domain}.custom_${suffix}`
   }
 
   // --- 씬 / 모드 (packages/scenes_core.yaml 의 로직을 그대로 옮김) ---

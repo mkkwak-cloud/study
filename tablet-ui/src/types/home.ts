@@ -13,6 +13,7 @@ export type RoomId =
   | 'small_room_1'
   | 'small_room_2'
   | 'small_room_3'
+  | 'study'
 
 export interface Room {
   id: RoomId
@@ -100,4 +101,17 @@ export interface AttentionItem {
   id: string
   severity: 'info' | 'warning' | 'urgent' // FR-61 알림 등급
   message: string
+}
+
+// FR-01/FR-02 확장: UI에서 새 기기를 등록하는 입력값. 실제 HA 연동 단계에서는
+// 이 입력이 "설정 > 기기 및 서비스"의 config flow로 대체된다(README 참고).
+export interface NewDeviceInput {
+  name: string
+  room: RoomId
+  domain: DeviceDomain
+  connection: ConnectionState
+  /** domain === 'appliance' 일 때만 사용 */
+  applianceKind?: ApplianceDevice['kind']
+  /** domain === 'appliance' 일 때만 사용. FR-22 고위험 여부 */
+  highRisk?: boolean
 }

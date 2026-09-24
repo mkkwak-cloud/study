@@ -16,5 +16,6 @@ export const homeActions = {
   toggleMediaPlayer: homeStore.toggleMediaPlayer.bind(homeStore),
   setVolume: homeStore.setVolume.bind(homeStore),
   toggleHighRiskAppliance: homeStore.toggleHighRiskAppliance.bind(homeStore),
+  addDevice: homeStore.addDevice.bind(homeStore),
   setConnectionLost: homeStore.setConnectionLost.bind(homeStore),
 }

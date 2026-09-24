@@ -317,6 +317,34 @@ devices:
     static_ip_or_reservation: false
     power_monitoring_needed: true
 
+  - id: study_light
+    entity_id: light.study_main
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: study
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: study_ac
+    entity_id: climate.study_ac
+    brand: lg # [확인 필요: Q3]
+    model: unknown
+    room: study
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S1_away]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
   - id: wall_tablet
     entity_id: null # 태블릿은 별도 HA Companion 앱 등록으로 device_tracker/sensor 군 생성
     brand: samsung

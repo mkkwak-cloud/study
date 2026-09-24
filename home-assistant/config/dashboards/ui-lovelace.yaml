@@ -207,6 +207,19 @@ views:
           - type: thermostat
             entity: climate.small_room_3_ac
 
+  - title: 서재
+    path: study
+    icon: mdi:bookshelf
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.study_main
+          - type: thermostat
+            entity: climate.study_ac
+
   - title: 관리
     path: admin
     icon: mdi:cog-outline
