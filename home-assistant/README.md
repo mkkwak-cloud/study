@@ -44,6 +44,10 @@ home-assistant/
 
 ## 시작하는 법
 
+> 실제 허브 하드웨어가 아직 없다면 [`SETUP_GUIDE.md`](./SETUP_GUIDE.md) 를
+> 먼저 따라 물리 서버를 준비한다(하드웨어 선택 → OS/Docker 설치 →
+> `http://<허브IP>:8123` 접속까지). 이미 허브가 켜져 있다면 아래부터 이어간다.
+
 1. **인벤토리 확인** — `config/inventory/inventory.yaml.example` 은 이미 샘플 기기로
    채워져 있다. 실제 보유 기기가 다르면 이 파일을 고치고 `docs/ASSUMPTIONS.md` 도
    같이 갱신한 뒤 `inventory.yaml` 로 복사한다.
