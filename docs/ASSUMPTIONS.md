@@ -26,6 +26,24 @@ PRD [`iot-integration-system-prd.md`](./iot-integration-system-prd.md) 12.2절 �
 Q3(삼성/LG/구글 실제 모델 목록), Q7(아파트 월패드 연동 필요 여부)은 코드에 직접 영향이
 적어 이번 샘플 확정에서 보류한다(Q7은 PRD상 이미 비목표로 다뤄짐).
 
+## 아키텍처 결정: SmartThings 직접 연동을 먼저, HA 허브는 나중에 (2026-09-24)
+
+PRD 10장은 A안(Home Assistant 로컬 허브)을 권장했지만, 대화를 통해 순서를
+다음과 같이 조정했다:
+
+1. **1단계(지금)**: 허브 하드웨어 없이 [`smartthings-bridge/`](../smartthings-bridge)
+   (작은 Node.js 백엔드)로 SmartThings API에 직접 연결하고, `tablet-ui`가 여기에
+   붙는다. 이미 보유한 SmartThings 스테이션에 등록된 삼성 기기만 대상.
+2. **2단계(필요해지면)**: LG/구글 기기가 늘어나거나 로컬/오프라인 제어(NFR-11)가
+   필요해지면 `home-assistant/`(SETUP_GUIDE.md)로 확장한다. `home-assistant/`
+   골격은 삭제하지 않고 유지한다.
+
+이유: 자체 UI로 SmartThings API를 직접 호출하는 순간(HA를 쓰든 안 쓰든) 삼성의
+개인 개발자 유료 요금제(2026-10~, 월 $4.99) 대상이 된다 — "Home Assistant를
+피하면 무료"가 아니라 "커스텀 제어 환경을 만들면 유료"가 기준이다. 이왕 비용이
+발생한다면 허브 하드웨어/Docker 설치 없이 가장 빠르게 검증 가능한 경로부터
+시작하는 쪽을 택했다.
+
 ## 영향받는 엔티티 명명 규칙
 
 `home-assistant/config/`(packages/dashboards)는 HA의 실제 도메인 규칙을 따르는

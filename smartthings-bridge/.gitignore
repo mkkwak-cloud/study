@@ -1,0 +1,6 @@
+node_modules
+dist
+.env
+
+# OAuth access/refresh token — 절대 커밋하지 않는다(NFR-20).
+tokens.json
