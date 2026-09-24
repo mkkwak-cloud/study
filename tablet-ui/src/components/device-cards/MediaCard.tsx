@@ -3,15 +3,18 @@ import { DeviceCardShell } from './DeviceCardShell'
 
 export function MediaCard({
   device,
+  room,
   onSelect,
 }: {
   device: MediaPlayerDevice
+  room?: string
   onSelect: () => void
 }) {
   return (
     <DeviceCardShell
       icon="📺"
       name={device.name}
+      room={room}
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}

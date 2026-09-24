@@ -7,7 +7,7 @@ export function HomeView({ state }: { state: HomeState }) {
   const attentionItems = computeAttentionItems(state)
 
   return (
-    <div className="flex flex-col gap-6 px-6 pb-6">
+    <div className="flex flex-col gap-6 px-4 pt-4 pb-6 sm:px-6">
       <SceneButtons activeMode={state.houseMode} />
       <AttentionBanner items={attentionItems} />
     </div>

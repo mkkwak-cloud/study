@@ -3,15 +3,18 @@ import { DeviceCardShell } from './DeviceCardShell'
 
 export function ClimateCard({
   device,
+  room,
   onSelect,
 }: {
   device: ClimateDevice
+  room?: string
   onSelect: () => void
 }) {
   return (
     <DeviceCardShell
       icon="❄️"
       name={device.name}
+      room={room}
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}

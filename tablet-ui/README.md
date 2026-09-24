@@ -5,9 +5,13 @@
 자체 프론트엔드의 선행 구현이다. 오픈 이슈(Q1/Q2/Q4/Q6)는
 [`../docs/ASSUMPTIONS.md`](../docs/ASSUMPTIONS.md) 의 샘플 값으로 임시 확정하고
 개발을 진행 중이며, 실제 HA 백엔드 연동은 아직 하지 않았으므로 **이 앱은 벽걸이
-태블릿에서 제어 흐름과 화면 구성을 먼저 검증하기 위한 UI 전용 목업**이다. 목(mock)
-스토어가 실제 기기 상태를 대신하며, `src/data/homeStore.ts` 하나만 HA WebSocket API
-클라이언트로 교체하면 나머지 컴포넌트는 그대로 쓰도록 설계했다.
+태블릿(가로)과 휴대용 태블릿/폰(세로) 모두에서 제어 흐름과 화면 구성을 먼저 검증
+하기 위한 UI 전용 목업**이다. 목(mock) 스토어가 실제 기기 상태를 대신하며,
+`src/data/homeStore.ts` 하나만 HA WebSocket API 클라이언트로 교체하면 나머지
+컴포넌트는 그대로 쓰도록 설계했다.
+
+하단 네비게이션(홈/기기/설정), 방 필터 칩("모든 기기" 등), 아이콘 배지 카드
+스타일은 삼성 SmartThings 앱의 UI 패턴을 참고해 다듬었다.
 
 ## 스택
 
@@ -37,7 +41,7 @@ npm run lint
 
 | PRD 항목 | 구현 위치 | 비고 |
 |---|---|---|
-| UX-03 (가로 고정) | `src/index.css` `.portrait-hint`, `App.tsx` | 세로 모드에서 안내만 표시. 실제 회전 잠금은 키오스크 앱/PWA 설치 후 처리(샘플 기종: Galaxy Tab A9+) |
+| UX-03 확장 (반응형: 가로·세로 모두 지원) | `src/index.css` `.device-grid`, `BottomNav.tsx`, `SceneButtons.tsx` | 벽걸이(가로)뿐 아니라 세로 화면에서도 동작하도록 확장. auto-fill 그리드(세로 2열~가로 7열)와 하단 네비게이션으로 폭에 따라 자연스럽게 흐름 |
 | UX-04 (터치 타깃 ≥48dp, 씬 버튼 ≥96dp) | `SceneButtons.tsx`(h-24=96px), `.touch-target` 유틸리티 | |
 | UX-05 (다크 모드 기본) | `src/index.css` | 고대비 테마(P1)는 범위 밖 |
 | UX-06 (화면 절전/스크린세이버) | `useIdleTimer.ts`, `IdleOverlay.tsx` | 데모 60초. 실제 밝기 제어는 태블릿 OS/키오스크 앱 몫 |
@@ -45,9 +49,10 @@ npm run lint
 | UX-08 (색+아이콘 상태 표현) | `device-cards/*` | 상태 텍스트 색상 + 이모지 아이콘 병기 |
 | UX-09 (즉각 피드백/진행/실패 사유) | `DeviceCardShell.tsx`, `homeStore.ts`(commit) | 낙관적 업데이트 + 지연 시뮬레이션 + 인위적 실패율로 실패 케이스 재현 |
 | UX-10 (고위험 기기 확인 절차) | `DeviceDetailView.tsx` | 카드 탭 → 상세화면 진입 → 토글 시 `window.confirm` 확인, 두 단계 진입이 길게 누르기를 대신함. 실제 배포 시 PIN 입력 다이얼로그로 교체 검토 |
-| UX-12 (연결 끊김 배너) | `StatusBar.tsx` | 데모 버튼으로 시뮬레이션 |
-| FR-10/11/13 (홈/방별/씬 뷰) | `HomeView.tsx`, `RoomView.tsx`, `RoomTabs.tsx` | |
-| FR-11 확장 (기기 선택 → 상세 조절 화면) | `DeviceDetailView.tsx`, `DeviceCardShell.tsx`, `App.tsx` | 방 그리드의 카드는 요약 타일(상태만 표시, `›` 표시)이고, 탭하면 전체화면 상세로 이동해 슬라이더/모드 선택 등 세부 컨트롤을 제공 |
+| UX-12 (연결 끊김 배너) | `StatusBar.tsx` | 배너는 상단 고정, 데모 트리거 버튼은 설정 탭으로 이동 |
+| FR-10/11/13 (홈/기기/씬 뷰) | `HomeView.tsx`, `DevicesView.tsx`, `BottomNav.tsx` | 방 탭 대신 하단 네비게이션(홈/기기/설정) + 기기 탭 안의 방 필터 칩 구조로 개편(삼성 SmartThings 앱의 하단 탭·"모든 기기" 필터 참고) |
+| FR-11 확장 (기기 선택 → 상세 조절 화면) | `DeviceDetailView.tsx`, `DeviceCardShell.tsx`, `App.tsx` | 방 그리드의 카드는 요약 타일(아이콘 배지+이름+상태, `›` 표시)이고, 탭하면 전체화면 상세로 이동해 슬라이더/모드 선택 등 세부 컨트롤을 제공 |
+| FR-12 (기기 유형/방별 필터) | `DeviceFilterChips.tsx`, `DevicesView.tsx` | "모든 기기" + 방별 칩. 모든 기기 보기에서는 카드에 방 이름을 함께 표시 |
 | FR-14 (연결성 표시) | `DeviceCardShell.tsx`/`DeviceDetailView.tsx` 연결 점·배지 (로컬/클라우드) | |
 | FR-21 (낙관적 상태 + 롤백) | `homeStore.ts` `commit()` | |
 | FR-22 (고위험 기기 원격 시작 우회 금지) | `DeviceDetailView.tsx` | 세탁기/건조기/식기세척기는 상태 표시만. 인덕션(고위험)은 상세 화면에서 `window.confirm` 확인 후에만 토글 가능 |

@@ -40,8 +40,8 @@ function iconFor(device: Device) {
 // 상세 조절 화면으로 이동한다. 슬라이더/모드 선택 등 세부 컨트롤은 여기에만 둔다.
 export function DeviceDetailView({ device, onBack }: { device: Device; onBack: () => void }) {
   return (
-    <div className="flex flex-col gap-6 px-6 pb-6">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-6 px-4 pt-4 pb-6 sm:px-6">
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={onBack}

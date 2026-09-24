@@ -1,11 +1,20 @@
 import type { LightDevice } from '../../types/home'
 import { DeviceCardShell } from './DeviceCardShell'
 
-export function LightCard({ device, onSelect }: { device: LightDevice; onSelect: () => void }) {
+export function LightCard({
+  device,
+  room,
+  onSelect,
+}: {
+  device: LightDevice
+  room?: string
+  onSelect: () => void
+}) {
   return (
     <DeviceCardShell
       icon="💡"
       name={device.name}
+      room={room}
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}

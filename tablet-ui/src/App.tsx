@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useHomeState } from './hooks/useHomeStore'
 import { useIdleTimer } from './hooks/useIdleTimer'
 import { StatusBar } from './components/StatusBar'
-import { RoomTabs, type ViewId } from './components/RoomTabs'
+import { BottomNav, type PrimaryTab } from './components/BottomNav'
 import { HomeView } from './components/HomeView'
-import { RoomView } from './components/RoomView'
+import { DevicesView } from './components/DevicesView'
+import { SettingsView } from './components/SettingsView'
 import { DeviceDetailView } from './components/DeviceDetailView'
 import { IdleOverlay } from './components/IdleOverlay'
 
@@ -14,45 +15,39 @@ const IDLE_AFTER_MS = 60_000
 
 function App() {
   const state = useHomeState()
-  const [view, setView] = useState<ViewId>('home')
+  const [tab, setTab] = useState<PrimaryTab>('home')
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
   const isIdle = useIdleTimer(IDLE_AFTER_MS)
 
-  // 방 탭을 바꾸면 열려 있던 기기 상세 화면은 닫는다.
-  const changeView = (next: ViewId) => {
+  // 하단 탭을 바꾸면 열려 있던 기기 상세 화면은 닫는다.
+  const changeTab = (next: PrimaryTab) => {
     setSelectedDeviceId(null)
-    setView(next)
+    setTab(next)
   }
 
   const selectedDevice = selectedDeviceId ? state.devices[selectedDeviceId] : null
 
   return (
-    <>
-      {/* UX-03: 좁은 세로 화면에서는 안내만 표시하고 대시보드는 숨긴다. */}
-      <div className="portrait-hint h-full flex-col items-center justify-center gap-3 bg-[var(--color-surface-sunken)] px-8 text-center text-gray-300">
-        <span className="text-4xl" aria-hidden>
-          📱↔️📱
-        </span>
-        <p className="text-lg font-medium">태블릿을 가로로 돌려주세요</p>
-        <p className="text-sm text-gray-500">이 대시보드는 가로 모드 전용입니다 (UX-03).</p>
+    // UX-03 확장: 가로(벽걸이)·세로(휴대) 화면 모두에서 동작한다. 하단
+    // 네비게이션(BottomNav)과 auto-fill 기기 그리드(.device-grid)로 폭에
+    // 따라 자연스럽게 레이아웃이 흐른다.
+    <div className="kiosk-shell flex h-full flex-col overflow-hidden">
+      <StatusBar state={state} />
+      <div className="flex-1 overflow-y-auto">
+        {selectedDevice ? (
+          <DeviceDetailView device={selectedDevice} onBack={() => setSelectedDeviceId(null)} />
+        ) : tab === 'home' ? (
+          <HomeView state={state} />
+        ) : tab === 'devices' ? (
+          <DevicesView state={state} onSelectDevice={setSelectedDeviceId} />
+        ) : (
+          <SettingsView state={state} />
+        )}
       </div>
-
-      <div className="kiosk-shell flex h-full flex-col overflow-hidden">
-        <StatusBar state={state} />
-        <RoomTabs active={view} onChange={changeView} />
-        <div className="flex-1 overflow-y-auto">
-          {selectedDevice ? (
-            <DeviceDetailView device={selectedDevice} onBack={() => setSelectedDeviceId(null)} />
-          ) : view === 'home' ? (
-            <HomeView state={state} />
-          ) : (
-            <RoomView state={state} room={view} onSelectDevice={setSelectedDeviceId} />
-          )}
-        </div>
-      </div>
+      <BottomNav active={tab} onChange={changeTab} />
 
       {isIdle && <IdleOverlay />}
-    </>
+    </div>
   )
 }
 

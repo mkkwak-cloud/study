@@ -3,13 +3,22 @@ import { DeviceCardShell } from './DeviceCardShell'
 
 // 4.3절 C5(IR/RF 리모컨식)처럼 위치 피드백이 없는 커튼은 position 이 null이며,
 // "추정 상태"로 표시해야 한다는 PRD 요구를 그대로 반영한다.
-export function CoverCard({ device, onSelect }: { device: CoverDevice; onSelect: () => void }) {
+export function CoverCard({
+  device,
+  room,
+  onSelect,
+}: {
+  device: CoverDevice
+  room?: string
+  onSelect: () => void
+}) {
   const hasFeedback = device.position !== null
 
   return (
     <DeviceCardShell
       icon="🪟"
       name={device.name}
+      room={room}
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}

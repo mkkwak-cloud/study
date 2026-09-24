@@ -9,9 +9,10 @@ const SCENES: { mode: HouseMode; label: string; icon: string }[] = [
 ]
 
 // UX-04: 주요 씬 버튼은 ≥96dp 터치 타깃. UX-07: 1탭으로 씬을 실행한다(S1/S3).
+// 세로(좁은) 화면에서는 2x2, 가로(넓은) 화면에서는 1x4로 배치된다.
 export function SceneButtons({ activeMode }: { activeMode: HouseMode }) {
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 gap-4 min-[420px]:grid-cols-4">
       {SCENES.map((scene) => {
         const active = activeMode === scene.mode
         return (

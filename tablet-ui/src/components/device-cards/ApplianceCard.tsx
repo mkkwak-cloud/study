@@ -27,9 +27,11 @@ const ICON: Record<ApplianceDevice['kind'], string> = {
 // 진입만 담당한다.
 export function ApplianceCard({
   device,
+  room,
   onSelect,
 }: {
   device: ApplianceDevice
+  room?: string
   onSelect: () => void
 }) {
   const isHighRisk = device.safetyTier === 'high'
@@ -38,6 +40,7 @@ export function ApplianceCard({
     <DeviceCardShell
       icon={ICON[device.kind]}
       name={device.name}
+      room={room}
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}
