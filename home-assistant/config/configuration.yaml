@@ -1,0 +1,65 @@
+# Home Assistant 코어 설정.
+# 선언적 텍스트 관리 원칙(NFR-41)에 따라 기기 메타/씬/자동화는 packages/ 아래
+# 목적별 파일로 분리하고, 이 파일은 플랫폼 배선과 전역 옵션만 둔다.
+
+homeassistant:
+  name: Home
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: !secret home_elevation
+  unit_system: metric
+  time_zone: Asia/Seoul
+  country: KR
+  packages: !include_dir_named packages
+
+default_config:
+
+# FR-30/FR-31: 태블릿·모바일과의 지속 연결(push) 채널
+mobile_app:
+websocket_api:
+
+# FR-51: 한국 공휴일 캘린더 연동 — 자동화 조건(평일 전용 스케줄 제외)에서 사용
+# workday 통합은 국가 코드만으로 한국 공휴일을 제공하지 않을 수 있어 [확인 필요].
+# 우선 HA 코어 `workday` 통합을 국가 코드 KR로 시도하고, 정확도가 부족하면
+# 별도 공휴일 캘린더 연동으로 교체한다.
+workday:
+  - name: workday_kr
+    country: KR
+
+# --- 브랜드별 통합 (9.1) ---
+# 대부분은 HA UI(설정 > 기기 및 서비스)에서 OAuth/PAT 플로우로 추가하는 것이
+# 원칙이다(YAML 플랫폼 설정이 아닌 Config Entry 방식). SmartThings/LG ThinQ/
+# Google Nest SDM/Matter/SwitchBot(BLE) 모두 여기 해당하며 이 파일에는 없다.
+#
+# 현재 샘플 인벤토리(inventory.yaml.example)에는 TV가 없다. TV를 다시 추가하면
+# docs/ASSUMPTIONS.md 샘플 네트워크(Q6: IoT VLAN 192.168.10.0/24)를 참고해
+# 아래처럼 LAN 통합을 등록한다:
+#   samsungtv:
+#     - host: 192.168.10.21 # DHCP 예약 필요(4.2 항목9)
+#   webostv:
+#     - host: 192.168.10.22 # 최초 페어링 시 TV 화면에서 승인 필요
+
+mqtt:
+  broker: !secret mqtt_broker_host
+  port: 1883
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+
+logger:
+  default: warning
+  logs:
+    homeassistant.components.smartthings: info
+    homeassistant.components.lg_thinq: info
+    homeassistant.components.nest: info
+    homeassistant.components.matter: info
+
+# UX-01 키오스크 대시보드 — dashboards/ui-lovelace.yaml 참조
+lovelace:
+  mode: yaml
+  dashboards:
+    kiosk-wallpad:
+      mode: yaml
+      title: Home
+      icon: mdi:home-automation
+      show_in_sidebar: false
+      filename: dashboards/ui-lovelace.yaml

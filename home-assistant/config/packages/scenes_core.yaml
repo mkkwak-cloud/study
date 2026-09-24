@@ -1,0 +1,139 @@
+# MVP(M2) P0 씬: S1 외출, S3 취침, S4 아침 커튼(§5).
+# entity_id 는 inventory.yaml.example 및 ../../../docs/ASSUMPTIONS.md 의
+# 샘플 명명 규칙(<domain>.<room>_<slug>)을 따른다(예: cover.living_room_curtain =
+# SwitchBot Curtain 3, 샘플 Q1). 실제 기기 등록 후 그대로 유지되거나 교체한다.
+#
+# light.turn_off/cover.close_cover 등은 entity_id: all 로 도메인 전체에
+# 브로드캐스트한다 — 코어 수정 없이 신규 기기를 추가만 하면 자동으로 씬에
+# 포함되게 하는 목적(NFR-40 플러그인형 원칙과 정합)이며, 방(area) 단위로
+# 좁히고 싶다면 area_id target 으로 바꾼다.
+
+script:
+  scene_away: # S1 외출 모드
+    alias: "씬: 외출"
+    icon: mdi:home-export-outline
+    mode: single
+    sequence:
+      - service: light.turn_off
+        target:
+          entity_id: all
+      - service: media_player.turn_off
+        target:
+          entity_id: all
+      - service: climate.turn_off
+        target:
+          entity_id: all
+      - service: cover.close_cover
+        target:
+          entity_id: all
+      # FR-22: 고위험 가전(오븐/인덕션 등)은 자동으로 끄지 않고 확인만 한다.
+      - service: script.turn_on
+        target:
+          entity_id: script.notify_if_high_risk_devices_on
+
+  scene_sleep: # S3 취침 모드
+    alias: "씬: 취침"
+    icon: mdi:weather-night
+    mode: single
+    sequence:
+      - service: light.turn_off
+        target:
+          entity_id: all
+      - service: cover.close_cover
+        target:
+          entity_id: all
+      - service: media_player.turn_off
+        target:
+          entity_id: all
+      # 공기청정기 수면모드: 기기별 서비스가 다르므로 개별 기기 등록 후
+      # 아래 placeholder entity_id 를 교체한다.
+      # - service: fan.set_preset_mode
+      #   target:
+      #     entity_id: fan.living_room_air_purifier
+      #   data:
+      #     preset_mode: sleep
+      - service: script.turn_on
+        target:
+          entity_id: script.dim_tablet_for_sleep
+
+  dim_tablet_for_sleep: # UX-06 취침 연동 소등
+    alias: "탭북 화면 소등 (취침 연동)"
+    sequence:
+      # Galaxy Tab A9+(샘플 Q2)에 HA Companion 앱 설치 후 노출되는 화면
+      # 밝기 엔티티. 실제 등록 후 자동 생성되는 entity_id로 교체한다.
+      - service: light.turn_off
+        target:
+          entity_id: light.wall_tablet_backlight
+
+  notify_if_high_risk_devices_on: # FR-22, S1 보조
+    alias: "고위험 가전 켜짐 확인 알림"
+    sequence:
+      - condition: template
+        # 고위험 기기 entity_id 목록은 inventory.yaml 의 safety_tier: high 항목으로 채운다.
+        value_template: >
+          {{ expand('group.high_risk_appliances') | selectattr('state','eq','on') | list | count > 0 }}
+      - service: notify.mobile_app_admin_phone # Companion 앱 등록 후 자동 생성되는 서비스명으로 교체
+        data:
+          title: "⚠ 외출 확인 필요"
+          message: >
+            켜진 상태로 감지된 고위험 가전이 있습니다:
+            {{ expand('group.high_risk_appliances') | selectattr('state','eq','on') | map(attribute='name') | join(', ') }}
+
+group:
+  high_risk_appliances:
+    name: High Risk Appliances
+    # 샘플(docs/ASSUMPTIONS.md) — inventory.yaml safety_tier: high 인 기기.
+    # 기기가 늘면 이 목록에 entity_id만 추가하면 된다(FR-04, FR-22).
+    entities:
+      - switch.kitchen_induction
+
+automation:
+  - id: mode_away_triggers_scene
+    alias: "모드: 외출 전환 시 씬 실행"
+    trigger:
+      - platform: state
+        entity_id: input_select.house_mode
+        to: "Away"
+    action:
+      - service: script.turn_on
+        target:
+          entity_id: script.scene_away
+
+  - id: mode_sleep_triggers_scene
+    alias: "모드: 취침 전환 시 씬 실행"
+    trigger:
+      - platform: state
+        entity_id: input_select.house_mode
+        to: "Sleep"
+    action:
+      - service: script.turn_on
+        target:
+          entity_id: script.scene_sleep
+
+  - id: morning_curtain_open # S4
+    alias: "아침 커튼 자동 개방 (평일 07:00)"
+    # 안방 커튼은 인벤토리에서 삭제됨 — 현재 커튼은 거실에만 있다.
+    trigger:
+      - platform: time
+        at: "07:00:00"
+    condition:
+      - condition: state
+        entity_id: binary_sensor.workday_kr
+        state: "on"
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: input_select.house_mode
+            state: "Vacation"
+    action:
+      - service: cover.set_cover_position
+        target:
+          entity_id: cover.living_room_curtain # 샘플(Q1): SwitchBot Curtain 3
+        data:
+          position: 50
+      - delay: "00:15:00"
+      - service: cover.set_cover_position
+        target:
+          entity_id: cover.living_room_curtain
+        data:
+          position: 100

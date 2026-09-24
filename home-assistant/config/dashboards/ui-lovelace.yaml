@@ -1,0 +1,247 @@
+# 벽걸이 태블릿 키오스크 대시보드 (7장 UX 요구사항).
+# - UX-03: 가로 고정, 3~4열 카드 그리드
+# - UX-04: 씬 버튼 ≥96dp (grid card square 옵션 + 큰 아이콘으로 근사)
+# - UX-05: 다크 모드 기본
+# - UX-07: 2탭 이내로 주요 제어 완료 (홈 화면에 씬 버튼을 직접 배치)
+# - UX-08: 상태를 색+아이콘 동시 표현 (state_color: true)
+# - UX-10: 고위험 기기는 길게 누르기+확인(confirmation)
+#
+# entity_id 는 ../../../docs/ASSUMPTIONS.md 의 샘플 결정(SwitchBot Curtain 3,
+# Galaxy Tab A9+ 등)을 따른다. inventory.yaml 이 실제 값으로 확정되면 교체하고,
+# 방(room)이 늘어나면 이 파일에 view 를 추가한다(FR-11).
+
+title: Home
+theme: default # 다크 테마 프로파일을 태블릿 계정에 기본값으로 설정(UX-05)
+views:
+  - title: 홈
+    path: home
+    icon: mdi:home
+    type: sections
+    cards:
+      - type: markdown
+        content: >
+          ## {{ now().strftime('%H:%M') }}
+          {{ states('sensor.living_room_temperature') }}°C ·
+          {{ states('weather.home') }}
+
+      # --- 씬 버튼 (UX-04: 큰 터치 타깃) ---
+      - type: grid
+        columns: 4
+        square: true
+        cards:
+          - type: button
+            name: 외출
+            icon: mdi:home-export-outline
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              target:
+                entity_id: input_select.house_mode
+              data:
+                option: Away
+          - type: button
+            name: 취침
+            icon: mdi:weather-night
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              target:
+                entity_id: input_select.house_mode
+              data:
+                option: Sleep
+          - type: button
+            name: 귀가
+            icon: mdi:home-import-outline
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              target:
+                entity_id: input_select.house_mode
+              data:
+                option: Home
+          - type: button
+            name: 휴가
+            icon: mdi:bag-suitcase
+            tap_action:
+              action: call-service
+              service: input_select.select_option
+              target:
+                entity_id: input_select.house_mode
+              data:
+                option: Vacation
+
+      # --- 주의 상태 (FR-10) ---
+      - type: entities
+        title: 주의 상태
+        state_color: true
+        entities:
+          - entity: group.high_risk_appliances
+            name: 켜진 고위험 가전
+          - entity: binary_sensor.any_curtain_open # template sensor로 집계 필요(미구현)
+            name: 열린 커튼
+          - entity: persistent_notification.integration_errors # HA 코어가 통합 오류 시 자동 생성
+            name: 통합 오류
+
+  - title: 거실
+    path: living-room
+    icon: mdi:sofa
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.living_room_main
+          - type: cover
+            entity: cover.living_room_curtain # 샘플(Q1): SwitchBot Curtain 3
+          - type: thermostat
+            entity: climate.living_room_ac
+          - type: thermostat
+            entity: climate.living_room_nest_thermostat # Google Nest 난방조절기(SDM API)
+          - type: media-control
+            entity: media_player.nest_hub # 샘플(Q4): Nest Hub 2세대
+          - type: entities
+            title: 로봇청소기
+            entities:
+              - entity: vacuum.living_room
+
+  - title: 안방
+    path: bedroom
+    icon: mdi:bed
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.bedroom_main
+          - type: thermostat
+            entity: climate.bedroom_ac
+
+  - title: 주방
+    path: kitchen
+    icon: mdi:countertop
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.kitchen_main
+          - type: entities
+            title: 냉장고
+            entities:
+              - entity: binary_sensor.fridge_door
+          - type: entities
+            title: 김치냉장고
+            entities:
+              - entity: binary_sensor.kimchi_fridge_door
+          # 고위험 가전(오븐/인덕션): 길게 누르기 + 확인 다이얼로그 (UX-10, FR-22)
+          - type: button
+            name: 인덕션
+            icon: mdi:stove
+            entity: switch.kitchen_induction
+            hold_action:
+              action: call-service
+              service: switch.toggle
+              target:
+                entity_id: switch.kitchen_induction
+              confirmation:
+                text: "인덕션 상태를 변경하시겠습니까?"
+            tap_action:
+              action: more-info
+
+  - title: 세탁실
+    path: utility
+    icon: mdi:washing-machine
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: entities
+            title: 세탁기
+            entities:
+              - entity: sensor.washer_operation_status
+          - type: entities
+            title: 건조기
+            entities:
+              - entity: sensor.dryer_operation_status
+          - type: entities
+            title: 식기세척기
+            entities:
+              - entity: sensor.dishwasher_operation_status
+
+  - title: 작은방1
+    path: small-room-1
+    icon: mdi:door
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.small_room_1_main
+          - type: thermostat
+            entity: climate.small_room_1_ac
+
+  - title: 작은방2
+    path: small-room-2
+    icon: mdi:door
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.small_room_2_main
+          - type: thermostat
+            entity: climate.small_room_2_ac
+
+  - title: 작은방3
+    path: small-room-3
+    icon: mdi:door
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.small_room_3_main
+          - type: thermostat
+            entity: climate.small_room_3_ac
+
+  - title: 서재
+    path: study
+    icon: mdi:bookshelf
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.study_main
+          - type: thermostat
+            entity: climate.study_ac
+
+  - title: 관리
+    path: admin
+    icon: mdi:cog-outline
+    # FR-82: 관리 화면 진입은 PIN/관리자 인증 뒤에 둔다.
+    # HA 네이티브에는 대시보드 단위 PIN 잠금이 없으므로, 최소 구현으로
+    # 홈 화면 사이드바에서 이 view 를 숨기고 물리적 접근만 허용하거나,
+    # community add-on(예: Kiosk Mode) 으로 role 기반 숨김을 적용한다.
+    visible: false
+    cards:
+      - type: entities
+        title: 시스템 상태
+        entities:
+          - sensor.disk_use_percent
+          - sensor.memory_use_percent
+          - sensor.processor_use
+      - type: entities
+        title: 모드
+        entities:
+          - input_select.house_mode
+          - input_boolean.child_lock_engaged
+          - input_boolean.guest_mode_active

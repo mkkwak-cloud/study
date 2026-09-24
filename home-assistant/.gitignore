@@ -1,0 +1,16 @@
+# 자격증명/런타임 상태 — NFR-20: 평문 비밀정보를 Git에 커밋하지 않는다.
+.env
+config/secrets.yaml
+config/inventory/inventory.yaml
+
+# HA 및 부속 컨테이너 런타임 데이터 (DB, 로그, 캐시, 페어링 정보 등)
+config/.storage/
+config/.cloud/
+config/home-assistant.log*
+config/home-assistant_v2.db*
+config/deps/
+config/tts/
+mosquitto/data/
+mosquitto/log/
+zigbee2mqtt/data/
+matter-server/data/

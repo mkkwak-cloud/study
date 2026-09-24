@@ -1,0 +1,23 @@
+{
+  "name": "smartthings-bridge",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "lint": "oxlint src"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^24.13.3",
+    "oxlint": "^1.81.0",
+    "tsx": "^4.19.0",
+    "typescript": "~6.0.2"
+  }
+}

@@ -1,0 +1,24 @@
+import { useSyncExternalStore } from 'react'
+import { homeStore } from '../data/homeStore'
+
+export function useHomeState() {
+  return useSyncExternalStore(homeStore.subscribe, homeStore.getSnapshot)
+}
+
+export const homeActions = {
+  setHouseMode: homeStore.setHouseMode.bind(homeStore),
+  toggleLight: homeStore.toggleLight.bind(homeStore),
+  setBrightness: homeStore.setBrightness.bind(homeStore),
+  setCoverPosition: homeStore.setCoverPosition.bind(homeStore),
+  toggleClimate: homeStore.toggleClimate.bind(homeStore),
+  adjustClimateTemp: homeStore.adjustClimateTemp.bind(homeStore),
+  setClimateMode: homeStore.setClimateMode.bind(homeStore),
+  toggleMediaPlayer: homeStore.toggleMediaPlayer.bind(homeStore),
+  setVolume: homeStore.setVolume.bind(homeStore),
+  toggleHighRiskAppliance: homeStore.toggleHighRiskAppliance.bind(homeStore),
+  startCleaning: homeStore.startCleaning.bind(homeStore),
+  pauseCleaning: homeStore.pauseCleaning.bind(homeStore),
+  returnVacuumToDock: homeStore.returnVacuumToDock.bind(homeStore),
+  addDevice: homeStore.addDevice.bind(homeStore),
+  setConnectionLost: homeStore.setConnectionLost.bind(homeStore),
+}

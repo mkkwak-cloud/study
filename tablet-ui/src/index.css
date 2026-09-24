@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  /* UX-08: 상태를 색+아이콘 동시 표현. 색각 이상을 고려해 항상 아이콘과 병기한다. */
+  --color-status-on: #22c55e;
+  --color-status-off: #64748b;
+  --color-status-warning: #f59e0b;
+  --color-status-urgent: #ef4444;
+  --color-status-pending: #3b82f6;
+
+  --color-surface: #111827;
+  --color-surface-raised: #1f2937;
+  --color-surface-sunken: #0b1220;
+}
+
+/* UX-05: 다크 모드 기본. 별도 라이트 테마는 이 스캐폴드 범위 밖(고대비 테마는 P1). */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-surface-sunken);
+  color: #e5e7eb;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR',
+    sans-serif;
+  /* UX-04: 터치 스크롤 시 텍스트 선택으로 인한 오조작 방지 */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* 벽걸이 태블릿(가로)뿐 아니라 세로 화면(휴대용 태블릿/폰)에서도 동작해야
+   하므로 고정 레이아웃 대신 auto-fill 그리드와 하단 네비게이션으로 모든
+   너비에서 자연스럽게 흐르도록 구성한다. 별도의 세로모드 차단 화면은 두지
+   않는다. */
+.kiosk-shell {
+  display: flex;
+}
+
+/* UX-04: 터치 타깃 최소 48x48dp 보장 유틸리티 */
+.touch-target {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* 기기 그리드: 세로(좁은 폭)에서는 2열, 가로(넓은 폭)에서는 자동으로 더
+   늘어난다. 카드 최소 폭 150px 기준으로 auto-fill. */
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
