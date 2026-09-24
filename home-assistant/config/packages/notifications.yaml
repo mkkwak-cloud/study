@@ -1,0 +1,127 @@
+# FR-60~63 알림 채널/등급, FR-62 시스템 헬스 알림, S5 가전 완료 알림, S7 이상 상태 알림.
+# notify.mobile_app_* 서비스명은 HA Companion 앱을 태블릿/스마트폰에 설치하고
+# 앱을 등록해야 생성된다(설정 > 기기 및 서비스 > Mobile App). 등록 후 실제
+# 서비스명으로 아래 placeholder 를 교체한다.
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /
+      - type: memory_use_percent
+      - type: processor_use
+
+automation:
+  # --- FR-62: 시스템 헬스 알림 (긴급, 방해금지 시간 무시) ---
+  - id: health_disk_low
+    alias: "헬스: 디스크 공간 부족"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.disk_use_percent
+        above: 90
+        for: "00:10:00"
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "🚨 허브 디스크 공간 부족"
+          message: "루트 파티션 사용률이 90%를 초과했습니다. 백업/로그 정리가 필요합니다."
+
+  - id: health_device_offline_long
+    alias: "헬스: 기기 장시간 오프라인"
+    trigger:
+      - platform: state
+        entity_id: [] # inventory.yaml 의 핵심 기기(허브, 게이트웨이 등) entity_id 로 채운다
+        to: "unavailable"
+        for: "01:00:00"
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "⚠ 기기 장시간 오프라인"
+          message: "{{ trigger.to_state.name }} 이(가) 1시간 이상 응답하지 않습니다."
+
+  - id: health_backup_failed
+    alias: "헬스: 백업 실패"
+    trigger:
+      - platform: event
+        event_type: backup_failed # HA Core 2024+ backup 통합에서 발생. 버전에 따라 이벤트명 확인 필요.
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "🚨 일일 백업 실패"
+          message: "NFR-50 백업 파이프라인을 확인하세요."
+
+  # --- S5: 가전 완료 알림 (세탁기/건조기/식기세척기) ---
+  # ThinQ/SmartThings 의 "운전 상태" 센서가 실제로 무엇을 노출하는지는
+  # 기기 등록 후 확인해야 한다(브랜드마다 state 값이 다름 — 예: "종료", "end").
+  - id: appliance_done_washer
+    alias: "가전 완료: 세탁기"
+    trigger:
+      - platform: state
+        entity_id: sensor.washer_operation_status # placeholder
+        to: "end" # 실제 상태값으로 교체
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder — 다중 수신자는 notify group 사용
+        data:
+          title: "세탁 완료"
+          message: "세탁기 작업이 끝났습니다."
+      - service: tts.speak # Nest 스피커 음성 알림(P1)
+        target:
+          entity_id: tts.google_translate_en_com # placeholder — cast 통합의 media_player로 target 지정
+        data:
+          media_player_entity_id: media_player.nest_hub # placeholder
+          message: "세탁이 끝났어요."
+
+  - id: appliance_done_dryer
+    alias: "가전 완료: 건조기"
+    trigger:
+      - platform: state
+        entity_id: sensor.dryer_operation_status # placeholder
+        to: "end"
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "건조 완료"
+          message: "건조기 작업이 끝났습니다."
+
+  - id: appliance_done_dishwasher
+    alias: "가전 완료: 식기세척기"
+    trigger:
+      - platform: state
+        entity_id: sensor.dishwasher_operation_status # placeholder
+        to: "end"
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "식기세척 완료"
+          message: "식기세척기 작업이 끝났습니다."
+
+  # --- S7: 이상 상태 알림 ---
+  - id: anomaly_fridge_door_open
+    alias: "이상: 냉장고 문 열림"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.fridge_door # placeholder
+        to: "on"
+        for: "00:02:00"
+    action:
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "🚨 냉장고 문 열림"
+          message: "냉장고 문이 2분 이상 열려 있습니다."
+
+  - id: anomaly_water_leak
+    alias: "이상: 누수 감지"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.leak_sensor # placeholder, 센서 추가 구매 전제(§4.1 공통)
+        to: "on"
+    action:
+      # 긴급 등급 — 방해금지 시간에도 전달(FR-61). Companion 앱 알림 채널에서
+      # 별도 "urgent" 채널로 설정해 DND 를 우회하도록 구성한다.
+      - service: notify.mobile_app_admin_phone # placeholder
+        data:
+          title: "🚨 누수 감지"
+          message: "누수가 감지되었습니다. 즉시 확인하세요."
+          data:
+            channel: urgent
+            importance: high

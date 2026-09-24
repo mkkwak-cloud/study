@@ -1,0 +1,39 @@
+# FR-43: 전역 모드(Home/Away/Sleep/Vacation) 상태 머신.
+# 씬/자동화는 이 input_select 값을 조건으로 참조한다(FR-41 조건절).
+
+input_select:
+  house_mode:
+    name: House Mode
+    icon: mdi:home-clock
+    options:
+      - Home
+      - Away
+      - Sleep
+      - Vacation
+    initial: Home
+
+# 어린이/고령자/게스트 UI 잠금 상태(FR-80~83, UX-10)에 쓰는 보조 헬퍼.
+input_boolean:
+  child_lock_engaged:
+    name: Child Lock Engaged
+    icon: mdi:lock
+
+  guest_mode_active:
+    name: Guest Mode Active
+    icon: mdi:account-clock
+
+# 관리 화면 진입 제한(FR-82)에 쓰는 PIN 비교용 입력 — 실제 검증 로직은
+# automations_core.yaml 의 admin_panel_pin_check 자동화에서 처리.
+input_text:
+  admin_pin_attempt:
+    name: Admin PIN Attempt
+    mode: password
+
+template:
+  - binary_sensor:
+      - name: "House Mode Is Away"
+        unique_id: house_mode_is_away
+        state: "{{ is_state('input_select.house_mode', 'Away') }}"
+      - name: "House Mode Is Sleep"
+        unique_id: house_mode_is_sleep
+        state: "{{ is_state('input_select.house_mode', 'Sleep') }}"

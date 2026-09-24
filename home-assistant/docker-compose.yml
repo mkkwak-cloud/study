@@ -1,0 +1,65 @@
+version: "3.9"
+
+# PRD 10장 권장안 A(Home Assistant 로컬 허브)의 최소 실행 구성.
+# 실제 배포 시 하드웨어(미니PC/SBC, Zigbee 코디네이터, Thread RCP 동글)와
+# 네트워크(VLAN, mDNS 리플렉터)는 오픈 이슈 Q4/Q6/Q10 확인 후 맞춰 조정한다(NFR-22).
+#
+# 기동:
+#   cp .env.example .env  # 값 채우기
+#   cp config/secrets.yaml.example config/secrets.yaml  # 값 채우기 (Git에 커밋 금지)
+#   docker compose up -d
+
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: ha-core
+    restart: unless-stopped
+    network_mode: host # mDNS/SSDP 기기 탐지(FR-02), Matter/Cast 로컬 통합에 필요
+    privileged: true # Bluetooth(BLE 커튼, IR-07) 및 USB Zigbee 코디네이터 접근용
+    volumes:
+      - ./config:/config
+      - /run/dbus:/run/dbus:ro
+    environment:
+      - TZ=Asia/Seoul
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: ha-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt:latest
+    container_name: ha-zigbee2mqtt
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    volumes:
+      - ./zigbee2mqtt/data:/app/data
+      - /run/udev:/run/udev:ro
+    devices:
+      # USB Zigbee 코디네이터 장치 경로. 실제 장치 연결 후 `ls /dev/serial/by-id/`로 확인해 교체.
+      # (4.3 C2 — 커튼이 Zigbee가 아니라면 온습도/문열림 등 공통 센서용으로 필요, §4.1 공통)
+      - /dev/serial/by-id/PLACEHOLDER_ZIGBEE_COORDINATOR:/dev/ttyACM0
+    environment:
+      - TZ=Asia/Seoul
+
+  matter-server:
+    # HA 2026-06 Matter 통합(matter.js 기반)이 의존하는 별도 서버.
+    # IR-01(Matter 우선 원칙), IR-02(멀티어드민)의 실행 기반.
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: ha-matter-server
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./matter-server/data:/data
+    command: --storage-path /data
+
+# Thread Border Router(OTBR)는 별도 RCP 동글 또는 기존 SmartThings
+# 스테이션/Nest Hub 2세대의 BR 재사용 여부에 따라 구성이 달라진다(오픈 이슈 Q4).
+# 확정 전까지 이 compose에는 포함하지 않는다.
