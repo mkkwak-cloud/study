@@ -1,0 +1,64 @@
+# 태블릿 키오스크 UI (독립 실행형 목업)
+
+[`../docs/iot-integration-system-prd.md`](../docs/iot-integration-system-prd.md) 7장(UX)과
+10장 "A+C 하이브리드"(1단계 HA 기본 대시보드 → 2단계 자체 프론트엔드)에서 언급한
+자체 프론트엔드의 선행 구현이다. 실제 기기/HA 백엔드 연동은 아직 미확정
+(오픈 이슈 Q1/Q2/Q4/Q6)이므로, **이 앱은 벽걸이 태블릿에서 제어 흐름과 화면
+구성을 먼저 검증하기 위한 UI 전용 목업**이다. 목(mock) 스토어가 실제 기기
+상태를 대신하며, 백엔드가 정해지면 `src/data/homeStore.ts` 하나만 HA
+WebSocket API 클라이언트로 교체하면 되도록 설계했다.
+
+## 스택
+
+`../package.json` 루트 앱과 동일한 구성: React 19 + TypeScript + Vite 8 +
+Tailwind CSS 4 + oxlint.
+
+## 실행
+
+```bash
+npm install
+npm run dev       # http://localhost:5173
+npm run build     # 타입체크 + 프로덕션 빌드
+npm run lint
+```
+
+## 구현 범위와 PRD 대응
+
+| PRD 항목 | 구현 위치 | 비고 |
+|---|---|---|
+| UX-03 (가로 고정) | `src/index.css` `.portrait-hint`, `App.tsx` | 세로 모드에서 안내만 표시. 실제 회전 잠금은 키오스크 앱/PWA 설치 후 처리(Q2) |
+| UX-04 (터치 타깃 ≥48dp, 씬 버튼 ≥96dp) | `SceneButtons.tsx`(h-24=96px), `.touch-target` 유틸리티 | |
+| UX-05 (다크 모드 기본) | `src/index.css` | 고대비 테마(P1)는 범위 밖 |
+| UX-06 (화면 절전/스크린세이버) | `useIdleTimer.ts`, `IdleOverlay.tsx` | 데모 60초. 실제 밝기 제어는 태블릿 OS/키오스크 앱 몫 |
+| UX-07 (2탭 이내 주요 제어) | `SceneButtons.tsx` | 씬은 1탭으로 실행 |
+| UX-08 (색+아이콘 상태 표현) | `device-cards/*` | 상태 텍스트 색상 + 이모지 아이콘 병기 |
+| UX-09 (즉각 피드백/진행/실패 사유) | `DeviceCardShell.tsx`, `homeStore.ts`(commit) | 낙관적 업데이트 + 지연 시뮬레이션 + 인위적 실패율로 실패 케이스 재현 |
+| UX-10 (고위험 기기 길게 누르기+확인) | `ApplianceCard.tsx`, `useLongPress.ts` | 인덕션 예시. `window.confirm` 사용 — 실제 배포 시 PIN 입력 다이얼로그로 교체 검토 |
+| UX-12 (연결 끊김 배너) | `StatusBar.tsx` | 데모 버튼으로 시뮬레이션 |
+| FR-10/11/13 (홈/방별/씬 뷰) | `HomeView.tsx`, `RoomView.tsx`, `RoomTabs.tsx` | |
+| FR-14 (연결성 표시) | `DeviceCardShell.tsx` 연결 점 (로컬/클라우드) | |
+| FR-21 (낙관적 상태 + 롤백) | `homeStore.ts` `commit()` | |
+| FR-22 (고위험 기기 원격 시작 우회 금지) | `ApplianceCard.tsx` | 세탁기/건조기/식기세척기는 상태 표시만, 원격 시작 버튼 없음 |
+| FR-40/41/43 (씬/모드) | `homeStore.ts` `setHouseMode()` | `home-assistant/config/packages/scenes_core.yaml` 의 로직을 그대로 옮김 |
+| §4.3 (위치 피드백 없는 커버) | `types/home.ts` `CoverDevice.position`(number \| null), `CoverCard.tsx` | C5(IR/RF) 케이스 대비 |
+
+## 아직 하지 않은 것
+
+- **실제 데이터 연동** — 전부 `src/data/initialDevices.ts` 목 데이터. HA
+  WebSocket API 연동은 `home-assistant/` 쪽 인벤토리가 확정된 뒤 진행한다.
+- **역할별 접근 제어(FR-80~83)** — 관리자/일반/어린이/게스트 구분 없음.
+  현재는 모든 사용자가 모든 조작 가능(단, 고위험 기기는 길게 누르기+확인만 적용).
+- **관리 화면 PIN(FR-82)** — Lovelace 쪽과 동일하게 아직 미해결.
+- **에너지 모니터링(FR-70~73), 공휴일 스케줄(FR-51), 음성 노출(FR-90~93)** — PRD
+  M3(P1) 이후 범위.
+- **PWA/키오스크 설치** — `manifest.json`, Service Worker, 화면 회전 잠금 등은
+  탭북 기종 확정(Q2) 후 추가한다.
+
+## 다음 단계
+
+1. 오픈 이슈 Q1/Q2/Q4 답변 후 `home-assistant/config/inventory/inventory.yaml`
+   확정.
+2. `src/data/homeStore.ts` 를 HA WebSocket API(`@home-assistant/js-websocket`
+   등) 클라이언트로 교체. `commit()` 이 하던 낙관적 업데이트/롤백 로직은
+   HA의 `result`/`event` 응답 처리로 대체한다.
+3. FR-80~83 역할 기반 접근 제어와 FR-82 관리자 PIN 게이트 추가.

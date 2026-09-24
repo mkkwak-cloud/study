@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  /* UX-08: 상태를 색+아이콘 동시 표현. 색각 이상을 고려해 항상 아이콘과 병기한다. */
+  --color-status-on: #22c55e;
+  --color-status-off: #64748b;
+  --color-status-warning: #f59e0b;
+  --color-status-urgent: #ef4444;
+  --color-status-pending: #3b82f6;
+
+  --color-surface: #111827;
+  --color-surface-raised: #1f2937;
+  --color-surface-sunken: #0b1220;
+}
+
+/* UX-05: 다크 모드 기본. 별도 라이트 테마는 이 스캐폴드 범위 밖(고대비 테마는 P1). */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-surface-sunken);
+  color: #e5e7eb;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR',
+    sans-serif;
+  /* UX-04: 터치 스크롤 시 텍스트 선택으로 인한 오조작 방지 */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* UX-03: 가로 고정 레이아웃. 실제 화면 회전 잠금은 키오스크 앱(Fully Kiosk 등)
+   또는 PWA 설치 후 Screen Orientation API 에서 처리한다(오픈 이슈 Q2 확인 후).
+   웹 프리뷰 단계에서는 세로 모드일 때 안내만 표시한다. */
+.portrait-hint {
+  display: none;
+}
+
+@media (orientation: portrait) and (max-width: 900px) {
+  .portrait-hint {
+    display: flex;
+  }
+  .kiosk-shell {
+    display: none;
+  }
+}
+
+/* UX-04: 터치 타깃 최소 48x48dp 보장 유틸리티 */
+.touch-target {
+  min-width: 48px;
+  min-height: 48px;
+}
