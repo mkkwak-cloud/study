@@ -1,6 +1,4 @@
 import type { ApplianceDevice } from '../../types/home'
-import { homeActions } from '../../hooks/useHomeStore'
-import { useLongPress } from '../../hooks/useLongPress'
 import { DeviceCardShell } from './DeviceCardShell'
 
 const STATUS_LABEL: Record<ApplianceDevice['status'], string> = {
@@ -24,41 +22,17 @@ const ICON: Record<ApplianceDevice['kind'], string> = {
   kimchi_fridge: '🥬',
 }
 
-// FR-22: 고위험 기기(인덕션 등)는 원격 시작을 우회하지 않고, 길게 누르기 +
-// 확인 절차를 거쳐야만 On/Off 를 바꿀 수 있다(UX-10).
-export function ApplianceCard({ device }: { device: ApplianceDevice }) {
+// 고위험 기기(인덕션 등)의 On/Off 전환은 이 카드가 아니라 DeviceDetailView의
+// 확인 절차를 거쳐야만 가능하다(FR-22, UX-10). 카드는 상태 요약과 상세 화면
+// 진입만 담당한다.
+export function ApplianceCard({
+  device,
+  onSelect,
+}: {
+  device: ApplianceDevice
+  onSelect: () => void
+}) {
   const isHighRisk = device.safetyTier === 'high'
-
-  const longPress = useLongPress({
-    onLongPress: () => {
-      const ok = window.confirm(`${device.name} 상태를 변경하시겠습니까?`)
-      if (ok) homeActions.toggleHighRiskAppliance(device.id)
-    },
-  })
-
-  if (isHighRisk) {
-    return (
-      <DeviceCardShell
-        icon={ICON[device.kind]}
-        name={device.name}
-        connection={device.connection}
-        pending={device.pending}
-        lastError={device.lastError}
-        {...longPress}
-      >
-        <div className="flex items-center justify-between">
-          <span
-            className={`text-sm font-semibold ${
-              device.on ? 'text-[var(--color-status-urgent)]' : 'text-[var(--color-status-off)]'
-            }`}
-          >
-            {device.on ? '켜짐' : '꺼짐'}
-          </span>
-          <span className="text-xs text-gray-500">길게 눌러 변경</span>
-        </div>
-      </DeviceCardShell>
-    )
-  }
 
   return (
     <DeviceCardShell
@@ -67,15 +41,26 @@ export function ApplianceCard({ device }: { device: ApplianceDevice }) {
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}
+      onSelect={onSelect}
     >
-      <div className="flex items-center justify-between">
-        <span className={`text-sm font-semibold ${STATUS_COLOR[device.status]}`}>
-          {STATUS_LABEL[device.status]}
+      {isHighRisk ? (
+        <span
+          className={`text-sm font-semibold ${
+            device.on ? 'text-[var(--color-status-urgent)]' : 'text-[var(--color-status-off)]'
+          }`}
+        >
+          {device.on ? '켜짐' : '꺼짐'}
         </span>
-        {(device.kind === 'fridge' || device.kind === 'kimchi_fridge') && device.doorOpen && (
-          <span className="text-xs text-[var(--color-status-warning)]">문 열림</span>
-        )}
-      </div>
+      ) : (
+        <div className="flex items-center justify-between">
+          <span className={`text-sm font-semibold ${STATUS_COLOR[device.status]}`}>
+            {STATUS_LABEL[device.status]}
+          </span>
+          {device.doorOpen && (
+            <span className="text-xs text-[var(--color-status-warning)]">문 열림</span>
+          )}
+        </div>
+      )}
     </DeviceCardShell>
   )
 }

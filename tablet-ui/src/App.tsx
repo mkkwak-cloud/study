@@ -5,6 +5,7 @@ import { StatusBar } from './components/StatusBar'
 import { RoomTabs, type ViewId } from './components/RoomTabs'
 import { HomeView } from './components/HomeView'
 import { RoomView } from './components/RoomView'
+import { DeviceDetailView } from './components/DeviceDetailView'
 import { IdleOverlay } from './components/IdleOverlay'
 
 // UX-06: 데모용 60초 유휴 기준. 실거치 환경에서는 값을 조정하거나
@@ -14,7 +15,16 @@ const IDLE_AFTER_MS = 60_000
 function App() {
   const state = useHomeState()
   const [view, setView] = useState<ViewId>('home')
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
   const isIdle = useIdleTimer(IDLE_AFTER_MS)
+
+  // 방 탭을 바꾸면 열려 있던 기기 상세 화면은 닫는다.
+  const changeView = (next: ViewId) => {
+    setSelectedDeviceId(null)
+    setView(next)
+  }
+
+  const selectedDevice = selectedDeviceId ? state.devices[selectedDeviceId] : null
 
   return (
     <>
@@ -29,12 +39,14 @@ function App() {
 
       <div className="kiosk-shell flex h-full flex-col overflow-hidden">
         <StatusBar state={state} />
-        <RoomTabs active={view} onChange={setView} />
+        <RoomTabs active={view} onChange={changeView} />
         <div className="flex-1 overflow-y-auto">
-          {view === 'home' ? (
+          {selectedDevice ? (
+            <DeviceDetailView device={selectedDevice} onBack={() => setSelectedDeviceId(null)} />
+          ) : view === 'home' ? (
             <HomeView state={state} />
           ) : (
-            <RoomView state={state} room={view} />
+            <RoomView state={state} room={view} onSelectDevice={setSelectedDeviceId} />
           )}
         </div>
       </div>

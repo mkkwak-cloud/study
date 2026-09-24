@@ -1,8 +1,13 @@
 import type { MediaPlayerDevice } from '../../types/home'
-import { homeActions } from '../../hooks/useHomeStore'
 import { DeviceCardShell } from './DeviceCardShell'
 
-export function MediaCard({ device }: { device: MediaPlayerDevice }) {
+export function MediaCard({
+  device,
+  onSelect,
+}: {
+  device: MediaPlayerDevice
+  onSelect: () => void
+}) {
   return (
     <DeviceCardShell
       icon="📺"
@@ -10,7 +15,7 @@ export function MediaCard({ device }: { device: MediaPlayerDevice }) {
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}
-      onClick={() => homeActions.toggleMediaPlayer(device.id)}
+      onSelect={onSelect}
     >
       <div className="flex items-center justify-between">
         <span

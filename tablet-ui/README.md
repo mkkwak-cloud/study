@@ -44,12 +44,13 @@ npm run lint
 | UX-07 (2탭 이내 주요 제어) | `SceneButtons.tsx` | 씬은 1탭으로 실행 |
 | UX-08 (색+아이콘 상태 표현) | `device-cards/*` | 상태 텍스트 색상 + 이모지 아이콘 병기 |
 | UX-09 (즉각 피드백/진행/실패 사유) | `DeviceCardShell.tsx`, `homeStore.ts`(commit) | 낙관적 업데이트 + 지연 시뮬레이션 + 인위적 실패율로 실패 케이스 재현 |
-| UX-10 (고위험 기기 길게 누르기+확인) | `ApplianceCard.tsx`, `useLongPress.ts` | 인덕션 예시. `window.confirm` 사용 — 실제 배포 시 PIN 입력 다이얼로그로 교체 검토 |
+| UX-10 (고위험 기기 확인 절차) | `DeviceDetailView.tsx` | 카드 탭 → 상세화면 진입 → 토글 시 `window.confirm` 확인, 두 단계 진입이 길게 누르기를 대신함. 실제 배포 시 PIN 입력 다이얼로그로 교체 검토 |
 | UX-12 (연결 끊김 배너) | `StatusBar.tsx` | 데모 버튼으로 시뮬레이션 |
 | FR-10/11/13 (홈/방별/씬 뷰) | `HomeView.tsx`, `RoomView.tsx`, `RoomTabs.tsx` | |
-| FR-14 (연결성 표시) | `DeviceCardShell.tsx` 연결 점 (로컬/클라우드) | |
+| FR-11 확장 (기기 선택 → 상세 조절 화면) | `DeviceDetailView.tsx`, `DeviceCardShell.tsx`, `App.tsx` | 방 그리드의 카드는 요약 타일(상태만 표시, `›` 표시)이고, 탭하면 전체화면 상세로 이동해 슬라이더/모드 선택 등 세부 컨트롤을 제공 |
+| FR-14 (연결성 표시) | `DeviceCardShell.tsx`/`DeviceDetailView.tsx` 연결 점·배지 (로컬/클라우드) | |
 | FR-21 (낙관적 상태 + 롤백) | `homeStore.ts` `commit()` | |
-| FR-22 (고위험 기기 원격 시작 우회 금지) | `ApplianceCard.tsx` | 세탁기/건조기/식기세척기는 상태 표시만, 원격 시작 버튼 없음 |
+| FR-22 (고위험 기기 원격 시작 우회 금지) | `DeviceDetailView.tsx` | 세탁기/건조기/식기세척기는 상태 표시만. 인덕션(고위험)은 상세 화면에서 `window.confirm` 확인 후에만 토글 가능 |
 | FR-40/41/43 (씬/모드) | `homeStore.ts` `setHouseMode()` | `home-assistant/config/packages/scenes_core.yaml` 의 로직을 그대로 옮김 |
 | §4.3 (위치 피드백 없는 커버) | `types/home.ts` `CoverDevice.position`(number \| null), `CoverCard.tsx` | C5(IR/RF) 케이스 대비 |
 

@@ -20,10 +20,8 @@ interface DeviceCardShellProps {
   pending: boolean
   lastError?: string
   children: ReactNode
-  onClick?: () => void
-  onPointerDown?: () => void
-  onPointerUp?: () => void
-  onPointerLeave?: () => void
+  /** 방 그리드에서는 요약 타일 탭 → 상세 조절 화면 이동(FR-11 확장)이 유일한 동작이다. */
+  onSelect: () => void
 }
 
 // 모든 기기 카드가 공유하는 뼈대. FR-14(연결성 표시), UX-08(색+아이콘),
@@ -35,18 +33,13 @@ export function DeviceCardShell({
   pending,
   lastError,
   children,
-  onClick,
-  onPointerDown,
-  onPointerUp,
-  onPointerLeave,
+  onSelect,
 }: DeviceCardShellProps) {
   return (
-    <div
-      className="touch-target flex flex-col gap-3 rounded-2xl bg-[var(--color-surface-raised)] p-4"
-      onClick={onClick}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
-      onPointerLeave={onPointerLeave}
+    <button
+      type="button"
+      onClick={onSelect}
+      className="touch-target flex flex-col gap-3 rounded-2xl bg-[var(--color-surface-raised)] p-4 text-left transition-colors hover:bg-gray-700"
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium text-gray-100">
@@ -55,11 +48,16 @@ export function DeviceCardShell({
           </span>
           {name}
         </div>
-        <span
-          className={`inline-flex h-2 w-2 rounded-full ${CONNECTION_DOT[connection]}`}
-          title={CONNECTION_LABEL[connection]}
-          aria-hidden
-        />
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex h-2 w-2 rounded-full ${CONNECTION_DOT[connection]}`}
+            title={CONNECTION_LABEL[connection]}
+            aria-hidden
+          />
+          <span className="text-gray-600" aria-hidden>
+            ›
+          </span>
+        </div>
       </div>
 
       {children}
@@ -73,6 +71,6 @@ export function DeviceCardShell({
       {!pending && lastError && (
         <div className="text-xs text-[var(--color-status-urgent)]">⚠ {lastError}</div>
       )}
-    </div>
+    </button>
   )
 }

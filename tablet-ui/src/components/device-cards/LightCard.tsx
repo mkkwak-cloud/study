@@ -1,8 +1,7 @@
 import type { LightDevice } from '../../types/home'
-import { homeActions } from '../../hooks/useHomeStore'
 import { DeviceCardShell } from './DeviceCardShell'
 
-export function LightCard({ device }: { device: LightDevice }) {
+export function LightCard({ device, onSelect }: { device: LightDevice; onSelect: () => void }) {
   return (
     <DeviceCardShell
       icon="💡"
@@ -10,7 +9,7 @@ export function LightCard({ device }: { device: LightDevice }) {
       connection={device.connection}
       pending={device.pending}
       lastError={device.lastError}
-      onClick={() => homeActions.toggleLight(device.id)}
+      onSelect={onSelect}
     >
       <div className="flex items-center justify-between">
         <span
@@ -22,19 +21,6 @@ export function LightCard({ device }: { device: LightDevice }) {
         </span>
         {device.on && <span className="text-xs text-gray-400">{device.brightness}%</span>}
       </div>
-
-      {device.on && (
-        <input
-          type="range"
-          min={1}
-          max={100}
-          value={device.brightness}
-          onClick={(e) => e.stopPropagation()}
-          onChange={(e) => homeActions.setBrightness(device.id, Number(e.target.value))}
-          className="touch-target w-full accent-[var(--color-status-pending)]"
-          aria-label={`${device.name} 밝기`}
-        />
-      )}
     </DeviceCardShell>
   )
 }

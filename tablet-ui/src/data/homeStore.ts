@@ -1,4 +1,4 @@
-import type { AttentionItem, Device, HouseMode } from '../types/home'
+import type { AttentionItem, ClimateDevice, Device, HouseMode } from '../types/home'
 import { initialDevices } from './initialDevices'
 
 // 프론트엔드 전용 목(mock) 스토어.
@@ -132,11 +132,23 @@ class HomeStore {
     this.commit(id, { targetTemp }, { targetTemp })
   }
 
+  setClimateMode(id: string, mode: ClimateDevice['mode']) {
+    const d = this.state.devices[id]
+    if (!d || d.domain !== 'climate') return
+    this.commit(id, { mode }, { mode })
+  }
+
   toggleMediaPlayer(id: string) {
     const d = this.state.devices[id]
     if (!d || d.domain !== 'media_player') return
     const next = !d.on
     this.commit(id, { on: next }, { on: next })
+  }
+
+  setVolume(id: string, volume: number) {
+    const d = this.state.devices[id]
+    if (!d || d.domain !== 'media_player') return
+    this.commit(id, { volume }, { volume })
   }
 
   /** FR-22: 고위험 기기 토글. 확인 절차는 호출 측(UI)에서 이미 통과한 상태로 가정한다. */

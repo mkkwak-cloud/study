@@ -12,7 +12,9 @@ export const homeActions = {
   setCoverPosition: homeStore.setCoverPosition.bind(homeStore),
   toggleClimate: homeStore.toggleClimate.bind(homeStore),
   adjustClimateTemp: homeStore.adjustClimateTemp.bind(homeStore),
+  setClimateMode: homeStore.setClimateMode.bind(homeStore),
   toggleMediaPlayer: homeStore.toggleMediaPlayer.bind(homeStore),
+  setVolume: homeStore.setVolume.bind(homeStore),
   toggleHighRiskAppliance: homeStore.toggleHighRiskAppliance.bind(homeStore),
   setConnectionLost: homeStore.setConnectionLost.bind(homeStore),
 }

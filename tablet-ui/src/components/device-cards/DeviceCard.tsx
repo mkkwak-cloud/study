@@ -5,17 +5,17 @@ import { ClimateCard } from './ClimateCard'
 import { MediaCard } from './MediaCard'
 import { ApplianceCard } from './ApplianceCard'
 
-export function DeviceCard({ device }: { device: Device }) {
+export function DeviceCard({ device, onSelect }: { device: Device; onSelect: () => void }) {
   switch (device.domain) {
     case 'light':
-      return <LightCard device={device} />
+      return <LightCard device={device} onSelect={onSelect} />
     case 'cover':
-      return <CoverCard device={device} />
+      return <CoverCard device={device} onSelect={onSelect} />
     case 'climate':
-      return <ClimateCard device={device} />
+      return <ClimateCard device={device} onSelect={onSelect} />
     case 'media_player':
-      return <MediaCard device={device} />
+      return <MediaCard device={device} onSelect={onSelect} />
     case 'appliance':
-      return <ApplianceCard device={device} />
+      return <ApplianceCard device={device} onSelect={onSelect} />
   }
 }
