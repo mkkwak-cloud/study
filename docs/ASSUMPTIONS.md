@@ -14,13 +14,14 @@ PRD [`iot-integration-system-prd.md`](./iot-integration-system-prd.md) 12.2절 �
 | Q1 (커튼 브랜드/모델) | **SwitchBot Curtain 3** (모터, BLE) + **SwitchBot Hub Mini** (Wi-Fi 브리지) | PRD 4.3 C4가 "블루투스+와이파이" 확정 통신방식과 부합도가 가장 높다고 분석한 조합. 모터↔BLE 로컬 제어, Hub Mini↔Wi-Fi 클라우드 폴백 |
 | Q2 (탭북 기종) | **삼성 Galaxy Tab A9+ (11인치, Android 14)** | UX-03 요구(10~12인치, 가로 고정)에 맞고 벽걸이용으로 흔히 쓰이는 보급형 Android 태블릿 |
 | Q4 (기존 허브 세대) | SmartThings **Station (2023, GP-U999BBUALWJ)**, Google **Nest Hub (2세대, 2021)** | 둘 다 Thread Border Router 내장 세대. HA `thread` 통합이 두 기기가 광고하는 기존 Thread 네트워크를 그대로 재사용한다고 가정(별도 OTBR 동글 불필요) |
+| (Q4 연장) 거실 난방 | **Google Nest Thermostat** 추가 보유 가정 (SDM API, 클라우드) | PRD 4.1/9.1에 이미 "Nest 온도조절기" 연동 경로가 정의돼 있어, 사용자가 거실에 Nest 난방조절기를 추가한다고 요청한 것을 이 경로로 반영 |
 | Q5 (SmartThings 유료 결제) | **지불함 (월 $4.99)** | 삼성 가전(냉장고/세탁기/에어컨 등)이 Matter 미지원일 가능성이 높아, SmartThings API를 유지하는 쪽이 커버리지(K1)에 유리하다고 가정 |
 | Q6 (네트워크 장비) | 공유기: **VLAN/다중 SSID 지원(예: ASUS RT-AX86U 계열)**, mDNS 리플렉터 활성화, IPv6 사용, NAS: **Synology (2-bay)** 보유 | NFR-22 네트워크 분리와 NFR-50 오프호스트 백업 대상 확보를 전제로 진행 |
 | Q8 (가족 구성) | 성인 2인 + 어린이 1인(8세) | FR-80~83 역할 설계(Admin/User/Restricted)의 기준값 |
 | Q9 (외부 접속) | **Tailscale** (VPN) | 포트포워딩 없이 개인 사용 규모에 설정이 간단함 |
 | Q10 (허브 하드웨어) | **미니PC (Intel N100, RAM 16GB, SSD 256GB)** | NFR-04 규모 가정(기기 300~1,500 엔티티)을 감당하면서 SBC보다 여유 있는 사양 |
 | Q11 (음성 비서) | Google(Gemini for Home) 위주, Bixby/ThinQ 음성 병행 유지 | FR-90 공존 원칙 그대로 |
-| Q12 (에너지 모니터링) | 스마트플러그 추가 구매로 실측(세탁기/건조기/TV 등 주요 기기) | FR-70 요구 충족을 위해 가전 자체 데이터만으로는 부족하다고 가정 |
+| Q12 (에너지 모니터링) | 스마트플러그 추가 구매로 실측(세탁기/건조기/에어컨 등 주요 기기) | FR-70 요구 충족을 위해 가전 자체 데이터만으로는 부족하다고 가정 |
 
 Q3(삼성/LG/구글 실제 모델 목록), Q7(아파트 월패드 연동 필요 여부)은 코드에 직접 영향이
 적어 이번 샘플 확정에서 보류한다(Q7은 PRD상 이미 비목표로 다뤄짐).
@@ -36,15 +37,26 @@ HA entity_id로 맞춰야 한다. 기기/방 대응은 동일하다:
 | home-assistant entity_id | tablet-ui id (현재, 목업 전용) | 기기 | 방 |
 |---|---|---|---|
 | `light.living_room_main` | `light.living_room_main` | 거실 메인 조명 | living_room |
-| `cover.living_room_curtain` | `cover.living_room_curtain` | 거실 커튼 (SwitchBot Curtain 3) | living_room |
+| `cover.living_room_curtain` | `cover.living_room_curtain` | 거실 커튼 (SwitchBot Curtain 3) — 안방 커튼은 삭제되어 커튼은 이 하나뿐 | living_room |
 | `climate.living_room_ac` | `climate.living_room_ac` | 거실 에어컨 | living_room |
-| `media_player.living_room_tv` | `media_player.living_room_tv` | 거실 삼성 TV | living_room |
+| `climate.living_room_nest_thermostat` | `climate.living_room_nest_thermostat` | 거실 난방조절기 (Google Nest, SDM API) | living_room |
 | `media_player.nest_hub` | `media_player.nest_hub` | Nest Hub 2세대 | living_room |
 | `light.bedroom_main` | `light.bedroom_main` | 안방 조명 | bedroom |
-| `cover.bedroom_curtain` | `cover.bedroom_curtain` | 안방 커튼 (SwitchBot Curtain 3) | bedroom |
 | `climate.bedroom_ac` | `climate.bedroom_ac` | 안방 에어컨 | bedroom |
+| `light.kitchen_main` | `light.kitchen_main` | 주방 조명 | kitchen |
 | `binary_sensor.fridge_door` | `appliance.fridge` | 냉장고 문열림 | kitchen |
+| `binary_sensor.kimchi_fridge_door` | `appliance.kimchi_fridge` | 김치냉장고 문열림 | kitchen |
 | `switch.kitchen_induction` | `appliance.induction` | 인덕션 (고위험) | kitchen |
 | `sensor.dishwasher_operation_status` | `appliance.dishwasher` | 식기세척기 | kitchen |
 | `sensor.washer_operation_status` | `appliance.washer` | 세탁기 | utility |
 | `sensor.dryer_operation_status` | `appliance.dryer` | 건조기 | utility |
+| `light.small_room_1_main` | `light.small_room_1_main` | 작은방1 조명 | small_room_1 |
+| `climate.small_room_1_ac` | `climate.small_room_1_ac` | 작은방1 에어컨 | small_room_1 |
+| `light.small_room_2_main` | `light.small_room_2_main` | 작은방2 조명 | small_room_2 |
+| `climate.small_room_2_ac` | `climate.small_room_2_ac` | 작은방2 에어컨 | small_room_2 |
+| `light.small_room_3_main` | `light.small_room_3_main` | 작은방3 조명 | small_room_3 |
+| `climate.small_room_3_ac` | `climate.small_room_3_ac` | 작은방3 에어컨 | small_room_3 |
+
+**삭제된 기기** (2026-09-24 반영): 거실 TV(`media_player.living_room_tv`), 안방 커튼
+(`cover.bedroom_curtain`). 아침 커튼 자동화(S4, `scenes_core.yaml`)는 남은 유일한
+커튼인 거실 커튼(`cover.living_room_curtain`)을 대상으로 옮겨졌다.

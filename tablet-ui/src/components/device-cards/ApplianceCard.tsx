@@ -21,6 +21,7 @@ const ICON: Record<ApplianceDevice['kind'], string> = {
   dishwasher: '🍽️',
   induction: '🔥',
   fridge: '🧊',
+  kimchi_fridge: '🥬',
 }
 
 // FR-22: 고위험 기기(인덕션 등)는 원격 시작을 우회하지 않고, 길게 누르기 +
@@ -71,7 +72,7 @@ export function ApplianceCard({ device }: { device: ApplianceDevice }) {
         <span className={`text-sm font-semibold ${STATUS_COLOR[device.status]}`}>
           {STATUS_LABEL[device.status]}
         </span>
-        {device.kind === 'fridge' && device.doorOpen && (
+        {(device.kind === 'fridge' || device.kind === 'kimchi_fridge') && device.doorOpen && (
           <span className="text-xs text-[var(--color-status-warning)]">문 열림</span>
         )}
       </div>

@@ -1,6 +1,6 @@
 # MVP(M2) P0 씬: S1 외출, S3 취침, S4 아침 커튼(§5).
 # entity_id 는 inventory.yaml.example 및 ../../../docs/ASSUMPTIONS.md 의
-# 샘플 명명 규칙(<domain>.<room>_<slug>)을 따른다(예: cover.bedroom_curtain =
+# 샘플 명명 규칙(<domain>.<room>_<slug>)을 따른다(예: cover.living_room_curtain =
 # SwitchBot Curtain 3, 샘플 Q1). 실제 기기 등록 후 그대로 유지되거나 교체한다.
 #
 # light.turn_off/cover.close_cover 등은 entity_id: all 로 도메인 전체에
@@ -112,6 +112,7 @@ automation:
 
   - id: morning_curtain_open # S4
     alias: "아침 커튼 자동 개방 (평일 07:00)"
+    # 안방 커튼은 인벤토리에서 삭제됨 — 현재 커튼은 거실에만 있다.
     trigger:
       - platform: time
         at: "07:00:00"
@@ -127,12 +128,12 @@ automation:
     action:
       - service: cover.set_cover_position
         target:
-          entity_id: cover.bedroom_curtain # 샘플(Q1): SwitchBot Curtain 3
+          entity_id: cover.living_room_curtain # 샘플(Q1): SwitchBot Curtain 3
         data:
           position: 50
       - delay: "00:15:00"
       - service: cover.set_cover_position
         target:
-          entity_id: cover.bedroom_curtain
+          entity_id: cover.living_room_curtain
         data:
           position: 100

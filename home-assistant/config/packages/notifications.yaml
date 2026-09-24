@@ -30,9 +30,9 @@ automation:
     alias: "헬스: 기기 장시간 오프라인"
     trigger:
       - platform: state
-        # 샘플: Nest Hub(Thread BR 겸용, Q4)와 거실 TV처럼 상시 온라인이어야
-        # 하는 핵심 로컬 기기. inventory.yaml 이 늘어나면 목록도 늘린다.
-        entity_id: [media_player.nest_hub, media_player.living_room_tv]
+        # 샘플: Nest Hub(Thread BR 겸용, Q4)처럼 상시 온라인이어야 하는 핵심
+        # 로컬 기기. inventory.yaml 이 늘어나면 목록도 늘린다.
+        entity_id: [media_player.nest_hub]
         to: "unavailable"
         for: "01:00:00"
     action:

@@ -5,7 +5,14 @@
 
 export type HouseMode = 'Home' | 'Away' | 'Sleep' | 'Vacation'
 
-export type RoomId = 'living_room' | 'bedroom' | 'kitchen' | 'utility'
+export type RoomId =
+  | 'living_room'
+  | 'bedroom'
+  | 'kitchen'
+  | 'utility'
+  | 'small_room_1'
+  | 'small_room_2'
+  | 'small_room_3'
 
 export interface Room {
   id: RoomId
@@ -74,7 +81,7 @@ export type ApplianceStatus = 'idle' | 'running' | 'done'
 
 export interface ApplianceDevice extends DeviceBase {
   domain: 'appliance'
-  kind: 'washer' | 'dryer' | 'dishwasher' | 'induction' | 'fridge'
+  kind: 'washer' | 'dryer' | 'dishwasher' | 'induction' | 'fridge' | 'kimchi_fridge'
   status: ApplianceStatus
   /** 인덕션처럼 On/Off 제어가 있는 고위험 기기용 */
   on?: boolean

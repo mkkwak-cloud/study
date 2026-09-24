@@ -27,22 +27,6 @@ devices:
     static_ip_or_reservation: false
     power_monitoring_needed: false
 
-  - id: bedroom_curtain
-    entity_id: cover.bedroom_curtain
-    brand: switchbot # 샘플(Q1)
-    model: "Curtain 3 (모터) + Hub Mini (Wi-Fi 브리지)"
-    room: bedroom
-    domain: cover
-    comm: [ble, wifi]
-    integration_path: C4_ble_local
-    local_or_cloud: L
-    matter_qr: false
-    connected_hub: null
-    required_automations: [S1_away, S3_sleep, S4_morning_curtain]
-    safety_tier: low
-    static_ip_or_reservation: false
-    power_monitoring_needed: false
-
   - id: living_room_main_light
     entity_id: light.living_room_main
     brand: unknown # [확인 필요: Q3] — 공통 조명은 Zigbee/Matter 전구로 가정
@@ -99,20 +83,18 @@ devices:
     static_ip_or_reservation: false
     power_monitoring_needed: true
 
-  - id: living_room_tv
-    entity_id: media_player.living_room_tv
-    brand: samsung
-    model: unknown # [확인 필요: Q3]
+  - id: living_room_nest_thermostat
+    entity_id: climate.living_room_nest_thermostat
+    brand: google
+    model: "Nest Thermostat" # 샘플 — 4.1/9.1 "Nest 온도조절기" 행에 대응
     room: living_room
-    domain: media_player
-    comm: [wifi_lan]
-    integration_path: samsungtv_local
-    local_or_cloud: L
-    matter_qr: false
-    connected_hub: null
-    required_automations: [S1_away, S12_movie_mode]
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: google_sdm_api
+    local_or_cloud: C # SDM API는 로컬 동작 없음(9.1 표)
+    required_automations: [S1_away]
     safety_tier: low
-    static_ip_or_reservation: true
+    static_ip_or_reservation: false
     power_monitoring_needed: false
 
   - id: nest_hub
@@ -153,10 +135,38 @@ devices:
       보유 확정(§4.1, §9.2). Zigbee 라디오는 벤더 종속이라 HA가 직접 재사용
       불가(§10) — 별도 Zigbee 코디네이터 필요. Thread BR은 재사용 가정.
 
+  - id: kitchen_main_light
+    entity_id: light.kitchen_main
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: kitchen
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
   - id: fridge
     entity_id: binary_sensor.fridge_door
     brand: samsung
     model: unknown # [확인 필요: Q3]
+    room: kitchen
+    domain: appliance
+    comm: [wifi_cloud]
+    integration_path: smartthings_api
+    local_or_cloud: C
+    required_automations: [S7_fridge_door]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: kimchi_fridge
+    entity_id: binary_sensor.kimchi_fridge_door
+    brand: samsung # [확인 필요: Q3] — 딤채/삼성/LG 등 브랜드 미상
+    model: unknown
     room: kitchen
     domain: appliance
     comm: [wifi_cloud]
@@ -219,6 +229,90 @@ devices:
     integration_path: lg_thinq_connect
     local_or_cloud: C
     required_automations: [S5_appliance_done]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: small_room_1_light
+    entity_id: light.small_room_1_main
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: small_room_1
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: small_room_1_ac
+    entity_id: climate.small_room_1_ac
+    brand: lg # [확인 필요: Q3]
+    model: unknown
+    room: small_room_1
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S1_away]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: small_room_2_light
+    entity_id: light.small_room_2_main
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: small_room_2
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: small_room_2_ac
+    entity_id: climate.small_room_2_ac
+    brand: lg # [확인 필요: Q3]
+    model: unknown
+    room: small_room_2
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S1_away]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: true
+
+  - id: small_room_3_light
+    entity_id: light.small_room_3_main
+    brand: unknown # [확인 필요: Q3]
+    model: unknown
+    room: small_room_3
+    domain: light
+    comm: [zigbee]
+    integration_path: zigbee2mqtt
+    local_or_cloud: L
+    required_automations: [S1_away, S3_sleep]
+    safety_tier: low
+    static_ip_or_reservation: false
+    power_monitoring_needed: false
+
+  - id: small_room_3_ac
+    entity_id: climate.small_room_3_ac
+    brand: lg # [확인 필요: Q3]
+    model: unknown
+    room: small_room_3
+    domain: climate
+    comm: [wifi_cloud]
+    integration_path: lg_thinq_connect
+    local_or_cloud: C
+    required_automations: [S1_away]
     safety_tier: low
     static_ip_or_reservation: false
     power_monitoring_needed: true

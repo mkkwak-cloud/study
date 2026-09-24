@@ -96,8 +96,8 @@ views:
             entity: cover.living_room_curtain # 샘플(Q1): SwitchBot Curtain 3
           - type: thermostat
             entity: climate.living_room_ac
-          - type: media-player
-            entity: media_player.living_room_tv
+          - type: thermostat
+            entity: climate.living_room_nest_thermostat # Google Nest 난방조절기(SDM API)
           - type: media-player
             entity: media_player.nest_hub # 샘플(Q4): Nest Hub 2세대
 
@@ -111,8 +111,6 @@ views:
         cards:
           - type: light
             entity: light.bedroom_main
-          - type: cover
-            entity: cover.bedroom_curtain # 샘플(Q1): SwitchBot Curtain 3
           - type: thermostat
             entity: climate.bedroom_ac
 
@@ -124,10 +122,16 @@ views:
       - type: grid
         columns: 3
         cards:
+          - type: light
+            entity: light.kitchen_main
           - type: entities
             title: 냉장고
             entities:
               - entity: binary_sensor.fridge_door
+          - type: entities
+            title: 김치냉장고
+            entities:
+              - entity: binary_sensor.kimchi_fridge_door
           # 고위험 가전(오븐/인덕션): 길게 누르기 + 확인 다이얼로그 (UX-10, FR-22)
           - type: button
             name: 인덕션
@@ -163,6 +167,45 @@ views:
             title: 식기세척기
             entities:
               - entity: sensor.dishwasher_operation_status
+
+  - title: 작은방1
+    path: small-room-1
+    icon: mdi:door
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.small_room_1_main
+          - type: thermostat
+            entity: climate.small_room_1_ac
+
+  - title: 작은방2
+    path: small-room-2
+    icon: mdi:door
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.small_room_2_main
+          - type: thermostat
+            entity: climate.small_room_2_ac
+
+  - title: 작은방3
+    path: small-room-3
+    icon: mdi:door
+    type: sections
+    cards:
+      - type: grid
+        columns: 3
+        cards:
+          - type: light
+            entity: light.small_room_3_main
+          - type: thermostat
+            entity: climate.small_room_3_ac
 
   - title: 관리
     path: admin

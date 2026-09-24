@@ -31,12 +31,13 @@ workday:
 # 원칙이다(YAML 플랫폼 설정이 아닌 Config Entry 방식). SmartThings/LG ThinQ/
 # Google Nest SDM/Matter/SwitchBot(BLE) 모두 여기 해당하며 이 파일에는 없다.
 #
-# 아래는 docs/ASSUMPTIONS.md 샘플 네트워크(Q6: IoT VLAN 192.168.10.0/24,
-# 신뢰 VLAN 192.168.20.0/24)를 가정한 예시다. 실제 VLAN 구성 후 IP를 교체한다.
-samsungtv:
-  - host: 192.168.10.21 # 거실 삼성 TV — DHCP 예약 필요(4.2 항목9)
-webostv:
-  - host: 192.168.10.22 # 안방 LG TV — 최초 페어링 시 TV 화면에서 승인 필요
+# 현재 샘플 인벤토리(inventory.yaml.example)에는 TV가 없다. TV를 다시 추가하면
+# docs/ASSUMPTIONS.md 샘플 네트워크(Q6: IoT VLAN 192.168.10.0/24)를 참고해
+# 아래처럼 LAN 통합을 등록한다:
+#   samsungtv:
+#     - host: 192.168.10.21 # DHCP 예약 필요(4.2 항목9)
+#   webostv:
+#     - host: 192.168.10.22 # 최초 페어링 시 TV 화면에서 승인 필요
 
 mqtt:
   broker: !secret mqtt_broker_host
